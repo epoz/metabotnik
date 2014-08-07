@@ -22,8 +22,8 @@
 
         <div id="banner" class="clearfix">
             <h2>Metabotnik</h2>
-            <h3 class="">About</h3>            
-            <h3 class="">Login</h3>
+            <h3 class="">About</h3>
+            {% if user.is_anonymous %}<h3 class=""><a href="/login">Login</a></h3>{% else %}<h3 class=""><a href="/logout">Logout</a></h3>{% endif %}
         </div>
         
         <div id="maincontent">
