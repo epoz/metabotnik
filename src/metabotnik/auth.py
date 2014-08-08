@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.http.response import HttpResponseBadRequest, HttpResponseForbidden
-
+from metabotnik.models import DropBoxInfo
 
 def get_dropbox_auth_flow(request):
     proto = 'https://' if request.is_secure() else 'http://'
@@ -53,8 +53,8 @@ class DropboxAuthBackend(object):
                                        password='bogus',
                                        last_name=info.get('display_name'),
                                        email=info.get('email'))
-
-        # TODO - store the access_token in the UserProfile
+            DropBoxInfo.objects.create(user=user, access_token=access_token)
+        
         return user
 
     def get_user(self, user_id):
