@@ -16,6 +16,6 @@
 </div>
 {% endif %}
 
-
-<a href="/newproject?folder={{path|urlencode}}" class="conversionbutton">New Project</a>
+{% if jpeg_files|length > 0 %}
+<a href="/projects/?new_with_folder={{path|urlencode}}&filecount={{jpeg_files|length}}" class="conversionbutton" title="Use the {{jpeg_files|length}} images in this folder for a new project">New Project</a>{% endif %}
 {% endblock maincontent %}

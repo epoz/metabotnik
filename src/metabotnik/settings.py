@@ -87,6 +87,8 @@ AUTHENTICATION_BACKENDS = (
     'metabotnik.auth.DropboxAuthBackend',
 )
 
+STORAGE_PATH = os.path.join(BASE_DIR, 'storage')
+
 import traceback
 try:
     from settings_local import *

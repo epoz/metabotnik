@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block maincontent %}
+<h3 title="Click to change the name">{{project.name|default:"(currently nameless project)"}}</h3>
+<div>{{project.path}}</div>
+<div>Has {{project.num_files_on_dropbox}} files on Dropbox, and {{project.num_files_local}} downloaded</div>
+<div>Created on: {{project.created}}</div>
+<div>Status: {{project.status}}</div>
+
+{% endblock maincontent %}

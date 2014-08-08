@@ -1,16 +1,39 @@
-from django.shortcuts import render, resolve_url, redirect
+from django.shortcuts import render, redirect
+from django.core.urlresolvers import reverse
 from django.conf import settings
 from dropbox.client import DropboxClient
-
+from metabotnik.models import Project
 
 def home(request):
     return render(request, 'index.html')
+
+def help(request, page):
+    return render(request, 'help/%s.html' % page)
+
+def new_project(request):
+    path = request.GET.get('new_with_folder')
+    if not path:
+        return render(request, 'projects.html',
+                      {'message': 'No path specified for the new project?'})
+    filecount = request.GET.get('filecount', 0)        
+    project = Project.objects.create(path=path, user=request.user, num_files_on_dropbox=filecount)
+    settings.STORAGE_PATH
+    url = reverse('project', args=[project.pk])
+    return redirect(url)
+
+def project(request, project_id):
+    project = Project.objects.get(pk=project_id)
+    return render(request, 'project.html', {'project':project})
+
+def projects(request):
+    if request.GET.get('new_with_folder'):
+        return new_project(request)
+    return render(request, 'projects.html', {'projects':Project.objects.all()})
 
 def folders(request):
     client = DropboxClient(request.user.dropboxinfo.access_token)
     path = request.GET.get('path', '/')
     folder_metadata = client.metadata(path)
-    print folder_metadata
 
     # Given a path like: /a/b/c
     # We want the pathsplit to look like:

@@ -1,5 +1,6 @@
 settings_local.*
 .DS_Store
+db.sqlite3
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -22,6 +23,7 @@ parts/
 sdist/
 var/
 include/
+share/
 *.egg-info/
 .installed.cfg
 *.egg
