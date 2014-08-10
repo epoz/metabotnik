@@ -1,6 +1,9 @@
 Django==1.6.5
+Pillow==2.5.1
 dropbox==2.1.0
 git-remote-helpers==0.1.0
+gnureadline==6.3.3
+ipython==2.2.0
 mercurial==2.9
 urllib3==1.9
 wsgiref==0.1.2
