@@ -1,8 +1,12 @@
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse, HttpResponseNotFound
 from django.conf import settings
 from dropbox.client import DropboxClient
-from metabotnik.models import Project
+from metabotnik.models import Project, new_task
+import os
 
 def home(request):
     return render(request, 'index.html')
@@ -10,6 +14,7 @@ def home(request):
 def help(request, page):
     return render(request, 'help/%s.html' % page)
 
+@login_required
 def new_project(request):
     path = request.GET.get('new_with_folder')
     if not path:
@@ -21,15 +26,36 @@ def new_project(request):
     url = reverse('project', args=[project.pk])
     return redirect(url)
 
+def projectpreview(request, project_id):
+    project = Project.objects.get(pk=project_id)
+    if project.previewfile_path():
+        return HttpResponse(open(project.previewfile_path()), mimetype='image/jpg')
+    return HttpResponseNotFound()
+
+@require_POST
+def projectmakepreview(request, project_id):
+    t = new_task(request.user, {
+                'action': 'make_preview',
+                'project_id': project_id
+    })
+    project = Project.objects.get(pk=project_id)
+    project.layout = request.POST.get('layout', 'horizontal')
+    project.status = 'previewing'
+    project.save()
+    return HttpResponse(str(t.pk))
+
+@login_required
 def project(request, project_id):
     project = Project.objects.get(pk=project_id)
     return render(request, 'project.html', {'project':project})
 
+@login_required
 def projects(request):
     if request.GET.get('new_with_folder'):
         return new_project(request)
     return render(request, 'projects.html', {'projects':Project.objects.all()})
 
+@login_required
 def folders(request):
     client = DropboxClient(request.user.dropboxinfo.access_token)
     path = request.GET.get('path', '/')

@@ -10,6 +10,8 @@ urlpatterns = patterns('',
     url(r'^folders/$', 'metabotnik.views.folders', name='folders'),
     url(r'^projects/$', 'metabotnik.views.projects', name='projects'),
     url(r'^projects/([0-9]+)/$', 'metabotnik.views.project', name='project'),
+    url(r'^projects/([0-9]+)/makepreview$', 'metabotnik.views.projectmakepreview', name='makepreview'),
+    url(r'^projects/([0-9]+)/preview\.jpg$', 'metabotnik.views.projectpreview', name='preview'),
 
     # Authentication
     url(r'^login$', 'metabotnik.auth.loginview', name='login'),

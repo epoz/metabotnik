@@ -87,6 +87,8 @@ AUTHENTICATION_BACKENDS = (
     'metabotnik.auth.DropboxAuthBackend',
 )
 
+LOGIN_URL = '/login'
+
 STORAGE_PATH = os.path.join(BASE_DIR, 'storage')
 
 import traceback

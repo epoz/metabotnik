@@ -7,4 +7,44 @@
 <div>Created on: {{project.created}}</div>
 <div>Status: {{project.status}}</div>
 
+{% if project.status == 'layout' %}<div style="margin-top: 20px; background-color: #eee; padding: 20px">
+<input type="radio" name="layout" value="horizontal"> horizontal layout<br>
+<input type="radio" name="layout" value="vertical"> vertical layout
+<a href="#" id="makepreview" class="conversionbutton">Make Preview</a>
+</div>{% endif %}
+
+{% if project.previewfile_path %}
+<div id="preview" class="openseadragon" style="height: 200px; margin-top: 40px"></div>    
+{% endif %}
+
 {% endblock maincontent %}
+
+{% block extra_javascript_end %}
+$('#makepreview').click(function(event) {
+    event.preventDefault();
+    var layout = $('input:radio[name=layout]:checked').val();
+    $.post('{% url 'makepreview' project.pk %}', 
+        {'csrfmiddlewaretoken': '{{csrf_token}}', 'layout': layout},
+        function(data) {
+            document.location.reload();
+    });
+});
+
+{% if project.previewfile_path %}
+    var viewer1 = OpenSeadragon({
+        id:            "preview",
+        maxZoomPixelRatio: 100,
+        prefixUrl:     '{{STATIC_URL}}openseadragon/images/',
+        showNavigator:  false,
+        zoomPerScroll:  1.05,
+        zoomPerSecond:  5,
+        tileSources: [
+            {
+                type: 'legacy-image-pyramid',
+                levels:[{"url": "preview.jpg", "width": 750, "height": 540}]
+            }
+        ]        
+    });
+{% endif %}
+
+{% endblock extra_javascript_end %}
