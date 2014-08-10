@@ -1,15 +1,22 @@
 from metabotnik.models import Project
 from dropbox.client import DropboxClient
 import os
+import sys
+import subprocess
 import traceback
 from django.utils import timezone
 import planodo
+from PIL import Image
 
 def execute_task(task):
-    payload = task.get_payload()         
-    action = payload.get('action')
-    task_function = globals().get(action) # Consider doing a getattr(sys.modules[__name__], action) ?
+    payload = task.get_payload()
+    task_function = globals().get(task.action) # Consider doing a getattr(sys.modules[__name__], action) ?
     if task_function:
+
+        # Bit of fun on local development machine
+        if sys.platform == 'darwin':
+            subprocess.call(['say', 'started task %s' % task.action])
+
         task.status = 'wip'
         task.time_started = timezone.now()
         task.save()
@@ -18,42 +25,63 @@ def execute_task(task):
             task.status = 'done'
             task.time_ended = timezone.now()
             task.save()
+            if sys.platform == 'darwin':
+                subprocess.call(['say', 'task %s done' % task.pk])
+
         except Exception:                
             payload['error'] = traceback.format_exc()
             task.status = 'error'
             task.set_payload(payload)        
     else:
         task.status = 'error'
-        payload['error'] = 'Task %s is unrecognised' % action
+        payload['error'] = 'Task %s is unrecognised' % task.action
         task.set_payload(payload)
 
 # Defined tasks follow here ############################################################
 
-def make_preview(payload):
-    project = Project.objects.get(pk=payload['project_id'])
-    project.set_status('previewing')
+def generate(payload):    
+    project = Project.objects.get(pk=payload['project_id'])    
 
-    # Calculate a row_width, row_height based on layout, widest, sqrt numbr of files etc.
-    row_width, row_height = 750, 270
+    if payload.get('preview'):
+        filename = os.path.join(project.storage_path, 'preview.jpg')
+        # For Previews, an arbitrary size
+        ROW_HEIGHT = 200
+        project.set_status('previewing')
+    else:
+        filename = os.path.join(project.storage_path, 'metabotnik.jpg')
+        # When generating the actual metabotnik, make all the originals the same height as 
+        # the first file found
+        original_files = [x for x in os.listdir(project.originals_path) if x.endswith('.jpg')]
+        if not original_files:
+            return
+        _, ROW_HEIGHT = Image.open( os.path.join(project.originals_path, original_files[0])).size
+        project.set_status('generating')
+
+    if os.path.exists(filename):
+        os.remove(filename)
+
 
     # Make all the originals the same height
     working = os.path.join(project.storage_path, 'wip')
-    planodo.make_images_sameheight(project.originals_path, working, row_height)
+    planodo.make_images_sameheight(project.originals_path, working, ROW_HEIGHT)
+
+    # Calculate a row_width, row_height based on layout, widest, sqrt numbr of files etc.
+    row_width, row_height = planodo.calc_row_width_height(working)
 
     # Make the rows
     rows = os.path.join(project.storage_path, 'wip', 'rows')
     planodo.make_rows(working, rows,  row_width, row_height)
 
-    # Make the final preview
-    filename = os.path.join(project.storage_path, 'preview.jpg')
-    previewfile = planodo.make_by_rows(rows, filename, row_width, row_height)
-    project.preview_width, project.preview_height = previewfile.size
+    # Make the final
+    theimage = planodo.make_by_rows(rows, filename, row_width, row_height)
+    if payload.get('preview'):
+        project.preview_width, project.preview_height = theimage.size
+    else:
+        project.metabotnik_width, project.metabotnik_height = theimage.size
     project.status = 'layout'
     project.save()
 
 def download_dropboxfiles(payload):
-    print 'Now downloading files for', repr(payload)
-    
     # Get the Project
     project = Project.objects.get(pk=payload['project_id'])
     project.set_status('downloading')
@@ -71,4 +99,7 @@ def download_dropboxfiles(payload):
             with client.get_file(x['path']) as f:
                 open(local_filepath, 'wb').write(f.read())
 
-    project.set_status('layout')
+    # Downloading files can take a long time
+    # In the meantime this Project could have been changed by other tasks
+    # Reload it before setting the status
+    Project.objects.get(pk=payload['project_id']).set_status('layout')

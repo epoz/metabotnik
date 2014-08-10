@@ -1,4 +1,5 @@
 import os
+import math
 from PIL import Image
 
 def clean(path):
@@ -6,21 +7,37 @@ def clean(path):
         if f.endswith('.jpg'):
             os.remove(os.path.join(path, f))
 
+def calc_row_width_height(src):
+    'For a given collection of files, calculate a good width and height for rows'
+    file_collection = {}
+    for x in os.listdir(src):
+        if x.endswith('.jpg'):
+            file_collection[x] = Image.open(os.path.join(src, x)).size
+
+    count_per_row = int(round(math.sqrt(len(file_collection))))    
+    average_width = sum(w for w,h in file_collection.values()) / len(file_collection)
+    row_height = sum(h for w,h in file_collection.values()) / len(file_collection)
+    row_width = count_per_row * average_width
+
+    return row_width, row_height
+
 def make_images_sameheight(src, dest, size=270):
     if not os.path.exists(dest):
         os.mkdir(dest)
+    clean(dest)
     count = 0
     for filename in os.listdir(src):
         if not filename.endswith('.jpg') or filename.startswith('.'):
             continue
         img = Image.open(os.path.join(src, filename))
         w,h = img.size
-        if h == size:
-            continue
-        ratio = float(w)/float(h)
-        new_w = int(size*ratio)
-        new_img = img.resize((new_w, size), Image.ANTIALIAS)
-        new_img.save(os.path.join(dest, filename))
+        if h != size:            
+            ratio = float(w)/float(h)
+            new_w = int(size*ratio)
+            new_img = img.resize((new_w, size), Image.ANTIALIAS)
+            new_img.save(os.path.join(dest, filename))
+        else:
+            img.save(os.path.join(dest, filename))
         count += 1
     return count
 
@@ -51,12 +68,13 @@ def make_rows(src, dest, row_width, row_height):
             t_w += w
             img = None
         else:
-            crow = row.crop((0,0,t_w,row_height))
-            crow.save(os.path.join(dest, '%.3d.jpg' % row_idx))
-            row = Image.new('RGBA', (row_width, row_height), color='white')
-            row_idx += 1
-            t_w = 0
-            x = 0
+            if t_w > 0:
+                crow = row.crop((0,0,t_w,row_height))
+                crow.save(os.path.join(dest, '%.3d.jpg' % row_idx))
+                row = Image.new('RGBA', (row_width, row_height), color='white')
+                row_idx += 1
+                t_w = 0
+                x = 0
     if t_w > 0:
         crow = row.crop((0,0,t_w,row_height))
         crow.save(os.path.join(dest, '%.3d.jpg' % row_idx))

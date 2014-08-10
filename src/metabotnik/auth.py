@@ -1,4 +1,5 @@
 from django.shortcuts import render, resolve_url, redirect
+from django.core.urlresolvers import reverse
 from dropbox.client import DropboxOAuth2Flow, DropboxClient
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -27,8 +28,11 @@ def dropboxauthredirect(request):
         access_token, user_id, url_state = \
                 get_dropbox_auth_flow(request).finish(request.REQUEST)        
         user = authenticate(user_id=user_id, access_token=access_token)
-        login(request, user)
-        return redirect('/')
+        if user.is_active:
+            login(request, user)
+            return redirect('/')
+        else:
+            return redirect(reverse('help', args=['await']))
     except DropboxOAuth2Flow.BadRequestException, e:
         return HttpResponseBadRequest()
     except DropboxOAuth2Flow.BadStateException, e:
@@ -52,7 +56,8 @@ class DropboxAuthBackend(object):
             user = User.objects.create(username=user_id, 
                                        password='bogus',
                                        last_name=info.get('display_name'),
-                                       email=info.get('email'))
+                                       email=info.get('email'),
+                                       is_active=False)
             DropBoxInfo.objects.create(user=user, access_token=access_token)
         
         return user

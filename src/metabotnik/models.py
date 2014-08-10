@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 import json
 import os
-from PIL import Image
+
 
 class DropBoxInfo(models.Model):
     user = models.OneToOneField(User, primary_key=True)
@@ -14,6 +14,8 @@ project_status_choices = (
     ('new', 'New'),
     ('downloading', 'Busy Downloading Files'),
     ('layout', 'Needs Layout'),
+    ('preview', 'Has a Preview'),
+    ('previewing', 'Busy Previewing'),
     ('generating', 'Busy Generating'),
     ('done', 'Done'),
 )
@@ -34,6 +36,8 @@ class Project(models.Model):
     layout_mode = models.CharField(max_length=100, choices=project_layout_choices, default='horizontal')
     preview_width = models.IntegerField(default=0)
     preview_height = models.IntegerField(default=0)
+    metabotnik_width = models.IntegerField(default=0)
+    metabotnik_height = models.IntegerField(default=0)
 
     def __unicode__(self):
         return self.name if self.name else self.path
@@ -66,11 +70,14 @@ class Project(models.Model):
     def num_files_local(self):
         return len([f for f in os.listdir(self.originals_path) if f.lower().endswith('.jpg')])
 
-    def previewfile_path(self):
-        tmp = os.path.join(self.storage_path, 'preview.jpg')
+    def file_path(self, tipe='preview'):
+        tmp = os.path.join(self.storage_path, '%s.jpg' % tipe)
         if os.path.exists(tmp):
             return tmp
-
+    # Following a bit of a weird construct, 
+    # needed due to template not being able to call a method with an argument
+    def file_path_metabotnik(self):
+        return self.file_path(tipe='metabotnik')
 
 task_status_choices = (
     ('new', 'New'),

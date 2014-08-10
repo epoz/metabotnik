@@ -26,21 +26,27 @@ def new_project(request):
     url = reverse('project', args=[project.pk])
     return redirect(url)
 
-def projectpreview(request, project_id):
+def projectpreview(request, project_id, hash, tipe):
+    # Why the hash param?
+    # It is basically ignored it can be any characters, but we are adding it to do cache-busting
+    # othwerwise browsers would not display the /preview.jpg file again.
+    # There is probably a better way to do this using some form of HTTP header, but yeah, TODO...
     project = Project.objects.get(pk=project_id)
-    if project.previewfile_path():
-        return HttpResponse(open(project.previewfile_path()), mimetype='image/jpg')
+    if project.file_path(tipe):
+        return HttpResponse(open(project.file_path(tipe)), mimetype='image/jpg')
     return HttpResponseNotFound()
 
 @require_POST
-def projectmakepreview(request, project_id):
+def generate(request, project_id):
+    preview = True if request.POST.get('preview') else False
     t = new_task(request.user, {
-                'action': 'make_preview',
+                'action': 'generate',
+                'preview': preview,
                 'project_id': project_id
     })
     project = Project.objects.get(pk=project_id)
     project.layout = request.POST.get('layout', 'horizontal')
-    project.status = 'previewing'
+    project.status = 'generating'
     project.save()
     return HttpResponse(str(t.pk))
 
@@ -53,7 +59,8 @@ def project(request, project_id):
 def projects(request):
     if request.GET.get('new_with_folder'):
         return new_project(request)
-    return render(request, 'projects.html', {'projects':Project.objects.all()})
+    return render(request, 'projects.html', 
+                  {'projects':Project.objects.filter(user=request.user)})
 
 @login_required
 def folders(request):

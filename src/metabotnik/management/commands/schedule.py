@@ -1,8 +1,6 @@
 from django.core.management.base import BaseCommand
 from metabotnik.models import Task
 from metabotnik.tasks import execute_task
-import logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 
     
 class Command(BaseCommand):
@@ -13,4 +11,6 @@ class Command(BaseCommand):
         for task in Task.objects.filter(status='new'):
             execute_task(task)
             count += 1
-        logging.debug('Executed %s tasks' % count) 
+
+# Run from cron every minute with
+# */1 * * * * cd /django_app/src/; /django_app/bin/python manage.py schedule
