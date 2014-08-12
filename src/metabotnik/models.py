@@ -94,6 +94,9 @@ class Task(models.Model):
     status = models.CharField(max_length=100, choices=task_status_choices, default='new')
     payload_data = models.TextField()
 
+    class Meta:
+        ordering = ('created',)
+
     def get_payload(self):
         try:
             return json.loads(self.payload_data)
