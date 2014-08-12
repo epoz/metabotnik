@@ -98,6 +98,8 @@ TEMPLATE_CONTEXT_PROCESSORS =(
     "django.core.context_processors.request"
 )
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
+
 LOGIN_URL = '/login'
 
 STORAGE_PATH = os.path.join(BASE_DIR, 'storage')
