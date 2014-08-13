@@ -39,6 +39,21 @@ def execute_task(task):
 
 # Defined tasks follow here ############################################################
 
+def makedeepzoom(payload):
+    project = Project.objects.get(pk=payload['project_id'])    
+    project.set_status('dzgen')
+
+    # Call VIPS to make the DZ
+    input_filepath = os.path.join(project.storage_path, 'metabotnik.jpg')
+    output_filepath = os.path.join(project.storage_path, 'deepzoom')
+
+    # rm the deepzoom folder
+    subprocess.call(['rm', '-rf', os.path.join(project.storage_path, 'deepzoom_files')])
+    subprocess.call(['vips', 'dzsave', input_filepath, output_filepath, '--suffix', '.jpg'])
+
+    project.set_status('done')
+
+
 def generate(payload):    
     project = Project.objects.get(pk=payload['project_id'])    
 
@@ -77,18 +92,12 @@ def generate(payload):
     if payload.get('preview'):
         project.preview_width, project.preview_height = theimage.size
     else:
-        project.metabotnik_width, project.metabotnik_height = theimage.size
-    project.status = 'dzgen'
-    project.save()
+        project.metabotnik_width, project.metabotnik_height = theimage.size        
+        t = new_task(request.user, {
+                'action': 'makedeepzoom',
+                'project_id': project.pk
+        })
 
-    # Call VIPS to make the DZ
-    input_filepath = os.path.join(project.storage_path, 'metabotnik.jpg')
-    output_filepath = os.path.join(project.storage_path, 'deepzoom')
-
-    # rm the deepzoom folder
-    subprocess.call(['rm', '-rf', os.path.join(project.storage_path, 'deepzoom_files')])
-    subprocess.call(['vips', 'dzsave', input_filepath, output_filepath, '--suffix', '.jpg'])
-    
     project.set_status('layout')
 
 def download_dropboxfiles(payload):
