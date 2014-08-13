@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
-from datetime import 
+from datetime import datetime
 import json
 import os
 
@@ -118,7 +118,7 @@ class Task(models.Model):
         return u'%s %s' % (self.action, self.user.email)
 
     def duration(self):
-
+        return self.created
 
 def new_task(user, payload):
     'Where payload is a dict containing the task details'
