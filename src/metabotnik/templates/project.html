@@ -17,12 +17,11 @@
 
 {% if project.preview_width > 0 and project.preview_height > 0 %}
 <div id="preview" class="openseadragon" style="height: 300px; margin-top: 40px"></div>
-
-{% if project.status != 'generating' %}
-<a href="#" id="generate" class="conversionbutton">Generate</a>    
+    {% if project.status != 'generating' %}
+    <a href="#" id="generate" class="conversionbutton">Generate</a>    
+    {% endif %}
 {% endif %}
 
-{% endif %}
 
 {% endblock maincontent %}
 
@@ -52,6 +51,14 @@ $('#generate').click(function(event) {
         maxZoomPixelRatio: 100,
         prefixUrl:     '{{STATIC_URL}}openseadragon/images/',
         showNavigator:  false,
+        {% if project.deepzoom %}
+        tileSources:   {
+                    Image: {
+                        xmlns:    "http://schemas.microsoft.com/deepzoom/2008",
+                        Url:      "/s/project_{{project.pk}}/deepzoom.dzi"
+                    }
+                }
+        {% else %}
         tileSources: [
             {
                 type: 'legacy-image-pyramid',
@@ -61,7 +68,8 @@ $('#generate').click(function(event) {
                          }
                 ]
             }
-        ]        
+        ]
+        {% endif %}
     });
 {% endif %}
 

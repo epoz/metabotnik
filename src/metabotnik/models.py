@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
+from datetime import 
 import json
 import os
 
@@ -80,6 +81,12 @@ class Project(models.Model):
     def file_path_metabotnik(self):
         return self.file_path(tipe='metabotnik')
 
+    def deepzoom(self):
+        tmp = os.path.join(self.storage_path, 'deepzoom_files')
+        if os.path.exists(tmp):
+            return tmp
+
+
 task_status_choices = (
     ('new', 'New'),
     ('wip', 'In Progress'),
@@ -109,6 +116,9 @@ class Task(models.Model):
 
     def __unicode__(self):
         return u'%s %s' % (self.action, self.user.email)
+
+    def duration(self):
+
 
 def new_task(user, payload):
     'Where payload is a dict containing the task details'

@@ -93,7 +93,7 @@ def generate(payload):
         project.preview_width, project.preview_height = theimage.size
     else:
         project.metabotnik_width, project.metabotnik_height = theimage.size        
-        t = new_task(project.user, {
+        new_task(project.user, {
                 'action': 'makedeepzoom',
                 'project_id': project.pk
         })
