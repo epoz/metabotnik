@@ -1,4 +1,4 @@
-from metabotnik.models import Project
+from metabotnik.models import Project, new_task
 from dropbox.client import DropboxClient
 import os
 import sys
