@@ -17,6 +17,7 @@ project_status_choices = (
     ('preview', 'Has a Preview'),
     ('previewing', 'Busy Previewing'),
     ('generating', 'Busy Generating'),
+    ('dzgen', 'Busy Making DeepZoom'),
     ('done', 'Done'),
 )
 project_layout_choices = (

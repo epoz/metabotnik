@@ -78,8 +78,18 @@ def generate(payload):
         project.preview_width, project.preview_height = theimage.size
     else:
         project.metabotnik_width, project.metabotnik_height = theimage.size
-    project.status = 'layout'
+    project.status = 'dzgen'
     project.save()
+
+    # Call VIPS to make the DZ
+    input_filepath = os.path.join(project.storage_path, 'metabotnik.jpg')
+    output_filepath = os.path.join(project.storage_path, 'deepzoom')
+
+    # rm the deepzoom folder
+    subprocess.call(['rm', '-rf', os.path.join(project.storage_path, 'deepzoom_files')])
+    subprocess.call(['vips', 'dzsave', input_filepath, output_filepath, '--suffix', '.jpg'])
+    
+    project.set_status('layout')
 
 def download_dropboxfiles(payload):
     # Get the Project

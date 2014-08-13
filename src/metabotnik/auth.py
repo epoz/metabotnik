@@ -60,8 +60,10 @@ class DropboxAuthBackend(object):
                                        email=info.get('email'),
                                        is_active=False)
             DropBoxInfo.objects.create(user=user, access_token=access_token)
-            send_mail('A new Metabotnik user has registered', 'And the user is https://metabotnik.com/admin/auth/user/%s/' % user.pk, 
-                      'info@metabotnik.com', ['eposthumus@gmail.com'], fail_silently=False)
+            if not settings.DEBUG:
+                send_mail('A new Metabotnik user has registered', 'And the user is https://metabotnik.com/admin/auth/user/%s/' % user.pk, 
+                          'info@metabotnik.com', ['eposthumus@gmail.com'], fail_silently=False)
+
         return user
 
     def get_user(self, user_id):
