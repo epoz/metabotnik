@@ -5,8 +5,8 @@
 <a href="/folders/" class="conversionbutton">Create a new Project</a>
 
 {% if projects %}
-<h3>You have made these projects:</h3>
-{% for p in projects %} <p><a href="{% url 'project' p.pk %}">{{p}}</a> [{{p.status}}]</p>{% endfor %}
+<h3>Projects</h3>
+{% for p in projects %} <p style="margin: 0"><a href="{% url 'project' p.pk %}">{{p}}</a> [{{p.status}}]</p>{% endfor %}
 {% else %}
 <h1>You do not have any projects yet</h1>
 {% endif %}
