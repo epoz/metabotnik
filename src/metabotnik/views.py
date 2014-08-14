@@ -39,9 +39,11 @@ def projectpreview(request, project_id, hash, tipe):
 @require_POST
 def generate(request, project_id):
     preview = True if request.POST.get('preview') else False
+    sendemail = True if request.POST.get('sendemail') in ('true', '1') else False
     t = new_task(request.user, {
                 'action': 'generate',
                 'preview': preview,
+                'sendemail': sendemail,
                 'project_id': project_id
     })
     project = Project.objects.get(pk=project_id)
