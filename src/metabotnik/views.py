@@ -50,7 +50,6 @@ def generate(request, project_id):
     project.save()
     return HttpResponse(str(t.pk))
 
-@login_required
 def project(request, project_id):
     project = Project.objects.get(pk=project_id)
     if project.user == request.user:
