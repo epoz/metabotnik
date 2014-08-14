@@ -56,6 +56,10 @@ def project(request, project_id):
     project = Project.objects.get(pk=project_id)
     if project.user == request.user:
         templatename = 'project.html'
+        if request.method == 'POST':
+            newname = request.POST.get('name')
+            project.name = newname
+            project.save()
     else:
         templatename = 'project_public.html'
     return render(request, templatename, {'project':project})

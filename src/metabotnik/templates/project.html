@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 
 {% block maincontent %}
-<h3 title="Click to change the name">{{project.name|default:"(currently nameless project)"}}</h3>
+<h3 title="Click to change the name" id="projectname">{{project.name|default:"(currently nameless project)"}}</h3>
+<input type="text" id="projectname_edit" style="display: none" size="75" placeholder="{{project.name|default:'Enter a project name'}}">
 <div>{{project.path}}</div>
 <div>Has {{project.num_files_on_dropbox}} files on Dropbox, and {{project.num_files_local}} downloaded</div>
 <div>Created on: {{project.created}}</div>
@@ -32,6 +33,25 @@
 {% endblock maincontent %}
 
 {% block extra_javascript_end %}
+$('#projectname').click(function(event) {
+    event.preventDefault();
+    $('#projectname').hide();
+    $('#projectname_edit').show();
+});
+$('#projectname_edit').keypress(function(event) {
+    if ( event.which == 13 ) {
+     event.preventDefault();
+     var name = $(this).val();
+     $('#projectname_edit').hide();
+     $.post('{% url 'project' project.pk %}',
+        {'csrfmiddlewaretoken': '{{csrf_token}}', 
+         'name': name, 
+        },
+        function(data) {
+            document.location.reload();
+    });
+  }
+});
 $('#makepreview').click(function(event) {
     event.preventDefault();
     var layout = $('input:radio[name=layout]:checked').val();
