@@ -63,7 +63,6 @@ def makedeepzoom(payload):
 
 def generate(payload):    
     project = Project.objects.get(pk=payload['project_id'])
-    import pdb; pdb.set_trace()
     # Check to see if the number of files retrieved from Dropbox is done yet.
     # If not, just reset this task to new and return
     if project.num_files_local < project.num_files_on_dropbox:

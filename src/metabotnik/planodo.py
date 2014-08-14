@@ -1,6 +1,10 @@
 import os
 import math
 from PIL import Image
+import warnings
+
+# Disable the warnings for giant images
+warnings.simplefilter('ignore', Image.DecompressionBombWarning)
 
 def clean(path):
     for f in os.listdir(path):
