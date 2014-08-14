@@ -5,6 +5,7 @@ import sys
 import subprocess
 import traceback
 from django.utils import timezone
+from django.conf import settings
 import planodo
 from PIL import Image
 
@@ -109,6 +110,10 @@ def generate(payload):
                 'action': 'makedeepzoom',
                 'project_id': project.pk
         })
+
+    if not settings.DEBUG:
+        send_mail('Your generation task for project %s done' % project.pk, 'It can be viewed at https://metabotnik.com/projects/%s/' % project.pk, 
+                  'info@metabotnik.com', [project.user.email], fail_silently=False)
 
     project.set_status('layout')
 
