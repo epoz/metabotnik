@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block maincontent %}
+<h3>{{project.name|default:"(currently nameless project)"}}</h3>
+
+{% if project.preview_width > 0 and project.preview_height > 0 %}
+<div id="preview" class="openseadragon" style="height: 300px; margin-top: 40px"></div>
+{% else %}
+<p>This project has not produced a metabotnik yet.</p>
+{% endif %}
+
+
+{% endblock maincontent %}
+
+{% block extra_javascript_end %}
+{% if project.file_path %}
+    var viewer1 = OpenSeadragon({
+        id:            "preview",
+        maxZoomPixelRatio: 100,
+        prefixUrl:     '{{STATIC_URL}}openseadragon/images/',
+        showNavigator:  false,
+        {% if project.deepzoom %}
+        tileSources: "/s/project_{{project.pk}}/deepzoom.dzi"
+        {% else %}
+        tileSources: [
+            {
+                type: 'legacy-image-pyramid',
+                levels: [{"url": "{{csrf_token}}/preview.jpg", 
+                          "width": {{project.preview_width}},         
+                          "height": {{project.preview_height}}
+                         }
+                ]
+            }
+        ]
+        {% endif %}
+    });
+{% endif %}
+
+{% endblock extra_javascript_end %}

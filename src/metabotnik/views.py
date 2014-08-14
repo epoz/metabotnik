@@ -53,14 +53,18 @@ def generate(request, project_id):
 @login_required
 def project(request, project_id):
     project = Project.objects.get(pk=project_id)
-    return render(request, 'project.html', {'project':project})
+    if project.user == request.user:
+        templatename = 'project.html'
+    else:
+        templatename = 'project_public.html'
+    return render(request, templatename, {'project':project})
 
 @login_required
 def projects(request):
     if request.GET.get('new_with_folder'):
         return new_project(request)
     return render(request, 'projects.html', 
-                  {'projects':Project.objects.filter(user=request.user)})
+                  {'projects':Project.objects.all()})
 
 @login_required
 def folders(request):

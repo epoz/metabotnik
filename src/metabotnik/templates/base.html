@@ -22,7 +22,10 @@
 
         {% block banner %}<div id="banner" class="clearfix">
             <h2>Metabotnik</h2>
-            <h3><a href="/">About</a></h3>            
+            {% if user.is_superuser %}
+                <h3><a href="/admin/">Admin</a></h3>
+            {% endif %}
+            <h3><a href="/">About</a></h3>
             {% if not user.is_anonymous %}<h3><a href="/projects/">Projects</a></h3>{% endif %}
             <h3><a href="/help/faq">FAQ</a></h3>
             <h3 style="margin-left: 300px">{% if user.is_anonymous %}<a href="/login">Login</a>{% else %}<h3 class=""><a href="/logout">Logout</a>{% endif %}</h3>

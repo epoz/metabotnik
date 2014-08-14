@@ -9,6 +9,9 @@
 
 {% if project.status != 'generating' %}
 <div style="margin-top: 20px; background-color: #eee; padding: 20px">
+    <div style="float:right">
+        <input type="checkbox" id="sendemail">
+    </div>
 <input type="radio" name="layout" value="horizontal"> horizontal layout<br>
 <input type="radio" name="layout" value="vertical"> vertical layout
 <a href="#" id="makepreview" class="conversionbutton">Make Preview</a>
@@ -17,9 +20,12 @@
 
 {% if project.preview_width > 0 and project.preview_height > 0 %}
 <div id="preview" class="openseadragon" style="height: 300px; margin-top: 40px"></div>
-    {% if project.status != 'generating' %}
-    <a href="#" id="generate" class="conversionbutton">Generate</a>    
-    {% endif %}
+
+{% if project.status != 'generating' %}
+<div style="margin-top: 20px; background-color: #eee; padding: 20px">
+<a href="#" id="generate" class="conversionbutton">Generate{% if project.deepzoom %} Again{%endif%}</a></div>    
+{% endif %}
+
 {% endif %}
 
 
