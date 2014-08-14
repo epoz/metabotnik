@@ -14,10 +14,10 @@
         </div>
     <input type="radio" name="layout" value="horizontal"> horizontal layout<br>
     <input type="radio" name="layout" value="vertical"> vertical layout
-    <a href="#" id="makepreview" class="conversionbutton">Generate Low-Resolution</a>
-    {% if project.status != 'generating' %}
-        <div style="margin-top: 20px; background-color: #eee; padding: 20px">
-        <a href="#" id="generate" class="conversionbutton">Generate Full-Resolution</a></div>    
+    Generate: 
+    <a href="#" id="makepreview" class="conversionbutton">Low-Resolution</a>
+    {% if project.status != 'generating' %}        
+        <a href="#" id="generate" class="conversionbutton">Full-Resolution</a>
     {% endif %}
     </div>
 {% endif %}
