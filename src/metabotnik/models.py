@@ -27,6 +27,7 @@ project_layout_choices = (
 )
 class Project(models.Model):
     name = models.CharField(max_length=250, blank=True)
+    description = models.TextField(blank=True)
     # Consider adding a 'source type' so that we can also get files from other places than Dropbox
     # For example, we might make one directly from Arkyves using symlinks,
     # and then path should point somewhere on local disk?
@@ -69,6 +70,7 @@ class Project(models.Model):
         if not os.path.exists(tmp): os.mkdir(tmp)
         return tmp
 
+    @property
     def num_files_local(self):
         return len([f for f in os.listdir(self.originals_path) if f.lower().endswith('.jpg')])
 

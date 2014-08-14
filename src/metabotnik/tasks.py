@@ -8,6 +8,10 @@ from django.utils import timezone
 import planodo
 from PIL import Image
 
+class RetryTaskException(Exception):
+    'Raise this Exception in a task to have it retried later'
+    pass
+
 def execute_task(task):
     payload = task.get_payload()
     task_function = globals().get(task.action) # Consider doing a getattr(sys.modules[__name__], action) ?
@@ -27,7 +31,10 @@ def execute_task(task):
             task.save()
             if sys.platform == 'darwin':
                 subprocess.call(['say', 'task %s done' % task.pk])
-
+        except RetryTaskException, e:
+            payload['error'] = 'Retrying %s' % e
+            task.status = 'new'
+            task.set_payload(payload)
         except Exception:                
             payload['error'] = traceback.format_exc()
             task.status = 'error'
@@ -55,7 +62,13 @@ def makedeepzoom(payload):
 
 
 def generate(payload):    
-    project = Project.objects.get(pk=payload['project_id'])    
+    project = Project.objects.get(pk=payload['project_id'])
+    import pdb; pdb.set_trace()
+    # Check to see if the number of files retrieved from Dropbox is done yet.
+    # If not, just reset this task to new and return
+    if project.num_files_local < project.num_files_on_dropbox:
+        raise RetryTaskException('Local files < Dropbox files')
+
 
     if payload.get('preview'):
         filename = os.path.join(project.storage_path, 'preview.jpg')

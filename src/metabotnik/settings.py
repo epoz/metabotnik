@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'metabotnik',
+    'south',
 )
 
 MIDDLEWARE_CLASSES = (
