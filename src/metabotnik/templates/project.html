@@ -7,18 +7,20 @@
 <div>Created on: {{project.created}}</div>
 <div>Status: {{project.status}}</div>
 
-{% if project.status != 'generating' %}
+{% if project.status != 'generating' and project.status != 'done'%}
     <div style="margin-top: 20px; background-color: #eee; padding: 20px">
         <div style="float:right">
             <input type="checkbox" id="sendemail"> Notify me via email when a task is completed
         </div>
     <input type="radio" name="layout" value="horizontal"> horizontal layout<br>
     <input type="radio" name="layout" value="vertical"> vertical layout
-    Generate: 
-    <a href="#" id="makepreview" class="conversionbutton">Low-Resolution</a>
-    {% if project.status != 'generating' %}        
-        <a href="#" id="generate" class="conversionbutton">Full-Resolution</a>
-    {% endif %}
+
+        <div style="margin-top: 10px">Generate:         
+        <a href="#" id="makepreview" class="conversionbutton">Low-Resolution</a>
+        {% if project.status != 'generating' %}        
+            <a href="#" id="generate" class="conversionbutton">Full-Resolution</a>
+        {% endif %}
+        </div>
     </div>
 {% endif %}
 
