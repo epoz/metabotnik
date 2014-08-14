@@ -64,7 +64,6 @@ def project(request, project_id):
         templatename = 'project_public.html'
     return render(request, templatename, {'project':project})
 
-@login_required
 def projects(request):
     if request.GET.get('new_with_folder'):
         return new_project(request)
