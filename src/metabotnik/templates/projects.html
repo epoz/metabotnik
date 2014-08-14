@@ -1,12 +1,14 @@
 {% extends "base.html" %}
 
 {% block maincontent %}
+
+<a href="/folders/" class="conversionbutton">Create a new Project</a>
+
 {% if projects %}
 <h3>You have made these projects:</h3>
 {% for p in projects %} <p><a href="{% url 'project' p.pk %}">{{p}}</a> [{{p.status}}]</p>{% endfor %}
 {% else %}
 <h1>You do not have any projects yet</h1>
-<a href="/folders/" class="conversionbutton">Click here to get started</a>
 {% endif %}
     
 {% endblock maincontent %}
