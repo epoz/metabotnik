@@ -2,7 +2,10 @@
 
 {% block maincontent %}
 
-<a href="/folders/" class="conversionbutton">Create a new Project</a>
+{% if not user.is_anonymous %}
+<a href="/folders/" class="conversionbutton">Create a new Project</a>    
+{% endif %}
+
 
 {% if projects %}
 <h3>Projects</h3>
