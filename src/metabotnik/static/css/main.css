@@ -125,7 +125,7 @@ body {
 #maincontent {
     width: 75%;
     margin: 0 auto 100px auto;
-    padding-top: 70px;
+    padding-top: 80px;
 }
 
 .conversionbutton {
@@ -157,6 +157,9 @@ body {
     padding: 10px 20px
 }
 
+.progress {display: inline-block}
+.progress.ui-progressbar {position:relative;height:1.3em;}
+.progress span {position:static;margin-top:-1.1em;text-align:center;display:block;line-height:1em;padding-left:10px;padding-right:10px;}
 
 /* ==========================================================================
    Helper classes

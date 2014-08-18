@@ -61,6 +61,10 @@ def delete_project(request, project_id):
     project.save()
     return HttpResponse('Deleted!')
 
+def num_files_local(request, project_id):
+    project = Project.objects.get(pk=project_id)
+    return HttpResponse(str(project.num_files_local))
+
 def project(request, project_id):
     project = Project.objects.get(pk=project_id)
     if project.user == request.user:

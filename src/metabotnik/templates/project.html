@@ -4,9 +4,13 @@
 <h3 title="Click to change the name" id="projectname">{{project.name|default:"(currently nameless project)"}}</h3>
 <input title="Press Enter to save the new name" type="text" id="projectname_edit" style="display: none" size="75" placeholder="{{project.name|default:'Enter a project name'}}">
 <div>{{project.path}}</div>
-<div>Has {{project.num_files_on_dropbox}} files on Dropbox, and {{project.num_files_local}} downloaded</div>
+<div>
+    <div class="progress"><span id="num_files_local">Has {{project.num_files_on_dropbox}} files on Dropbox, and {{project.num_files_local}} downloaded</span></div>
+</div>
 <div>Created on: {{project.created}}</div>
-<div>Status: {{project.status}}</div>
+<div>Status: {{project.status}} {% if project.status == 'generating' %}<img src="{{STATIC_URL}}/img/spinner.gif" title="Please wait, now generating your metabotnik">
+    
+{% endif %}</div>
 <div><a href="#" class="button" id="deleteproject">Delete this project</a>
 </div>
 
@@ -37,6 +41,33 @@
 {% endblock maincontent %}
 
 {% block extra_javascript_end %}
+var num_files_local = {{project.num_files_local}};
+var num_files_on_dropbox = {{project.num_files_on_dropbox}};
+$(".progress").each(function() {
+    $(this).progressbar({
+        value: 1
+    }).children("span").appendTo(this);
+});
+function getDownloadProgress() {
+    $.get('{% url 'num_files_local' project.pk %}', 
+          function(data) {
+              num_files_local = parseInt(data);
+          }
+    );
+    if(num_files_local<num_files_on_dropbox) {
+        if(num_files_local>0) {
+            $('.progress').progressbar( "option", "value", num_files_local/num_files_on_dropbox*100 );
+        }        
+        var tmp = 'Has {{project.num_files_on_dropbox}} files on Dropbox, and ' + num_files_local + ' downloaded';
+        setTimeout(getDownloadProgress, 1000);
+    } else {
+        var tmp = 'All {{project.num_files_on_dropbox}} files retrieved from Dropbox';
+        $('.progress').progressbar( "option", "value", 100 );
+    }
+    $('#num_files_local').html(tmp);
+}
+getDownloadProgress();
+
 $('#deleteproject').click(function(event) {
     event.preventDefault();
     var confirmdelete = confirm('Are you sure you want to delete this project?');

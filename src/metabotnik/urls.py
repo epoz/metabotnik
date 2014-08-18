@@ -12,7 +12,8 @@ urlpatterns = patterns('',
     url(r'^projects/([0-9]+)/$', 'metabotnik.views.project', name='project'),
     url(r'^projects/([0-9]+)/generate$', 'metabotnik.views.generate', name='generate'),
     url(r'^projects/([0-9]+)/delete$', 'metabotnik.views.delete_project', name='delete_project'),
-    
+    url(r'^projects/([0-9]+)/num_files_local$', 'metabotnik.views.num_files_local', name='num_files_local'),
+
     url(r'^projects/([0-9]+)/(\w+)/(preview)\.jpg$', 'metabotnik.views.projectpreview', name='preview'),
     url(r'^projects/([0-9]+)/(\w+)/(metabotnik)\.jpg$', 'metabotnik.views.projectpreview', name='metabotnik'),
 

@@ -14,6 +14,7 @@
         <script src="{{STATIC_URL}}js/vendor/modernizr-2.8.0.min.js"></script>
         <script type="text/javascript" src="{{STATIC_URL}}openseadragon/openseadragon.min.js"></script>
         <link href='https://fonts.googleapis.com/css?family=Ubuntu' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}jquery.ui/jquery-ui.min.css">
     </head>
     <body>
         <!--[if lt IE 8]>
@@ -80,6 +81,10 @@
         <script>window.jQuery || document.write('<script src="{{STATIC_URL}}js/vendor/jquery-1.11.1.min.js"><\/script>')</script>
         <script src="{{STATIC_URL}}js/plugins.js"></script>
         <script src="{{STATIC_URL}}js/main.js"></script>
+
+        <script src="//code.jquery.com/ui/1.11.1/jquery-ui.min.js"></script>
+        <script>window.jQuery.ui || document.write('<script src="{{STATIC_URL}}jquery.ui/jquery-ui.min.js"><\/script>')</script>
+
 
         <script type="text/javascript">{% block extra_javascript_end %}{% endblock extra_javascript_end %}</script>
 
