@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseForbidden
 from django.conf import settings
 from dropbox.client import DropboxClient
 from metabotnik.models import Project, new_task
@@ -52,6 +52,15 @@ def generate(request, project_id):
     project.save()
     return HttpResponse(str(t.pk))
 
+@require_POST
+def delete_project(request, project_id):
+    project = Project.objects.get(pk=project_id)
+    if project.user != request.user:
+        raise HttpResponseForbidden('Only the owner can delete a project')
+    project.status = 'deleted'
+    project.save()
+    return HttpResponse('Deleted!')
+
 def project(request, project_id):
     project = Project.objects.get(pk=project_id)
     if project.user == request.user:
@@ -68,7 +77,7 @@ def projects(request):
     if request.GET.get('new_with_folder'):
         return new_project(request)
     return render(request, 'projects.html', 
-                  {'projects':Project.objects.all()})
+                  {'projects':Project.objects.exclude(status='deleted')})
 
 @login_required
 def folders(request):

@@ -131,7 +131,14 @@ body {
 .conversionbutton {
     margin: 0 auto; width: 300px; padding: 3px;
     display: block; text-decoration: none; text-align: center;
-    background-color: red; color: white; font-size: 140%;   
+    background-color: red; color: white; font-size: 140%;
+    -webkit-border-radius: 10px; -moz-border-radius: 10px; border-radius: 10px;
+}
+.button {
+    margin: 0 auto; padding: 3px 12px;
+    text-decoration: none; text-align: center;
+    background-color: #aaa; color: white;
+    -webkit-border-radius: 10px; -moz-border-radius: 10px; border-radius: 10px;
 }
 
 .shout {

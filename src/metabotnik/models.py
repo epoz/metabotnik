@@ -20,6 +20,7 @@ project_status_choices = (
     ('generating', 'Busy Generating'),
     ('dzgen', 'Busy Making DeepZoom'),
     ('done', 'Done'),
+    ('deleted', 'Deleted'),
 )
 project_layout_choices = (
     ('horizontal', 'horizontal'),
