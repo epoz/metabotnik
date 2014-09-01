@@ -39,7 +39,7 @@ def make_images_sameheight(src, dest, size=270):
             ratio = float(w)/float(h)
             new_w = int(size*ratio)
             new_img = img.resize((new_w, size), Image.ANTIALIAS)
-            new_img.save(os.path.join(dest, filename))
+            new_img.convert('RGB').save(os.path.join(dest, filename))
         else:
             img.convert('RGB').save(os.path.join(dest, filename))
         count += 1
