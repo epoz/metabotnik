@@ -16,6 +16,7 @@
     {% if project.status != 'downloading' %}
         <a href="#" class="button" id="downloadfiles">Get files from Dropbox</a>
     {% endif %}
+    <input type="checkbox" id="public" title="If this is checked, all users can see this project"> Published
 </div>
 
 {% if project.status != 'generating' and project.status != 'done' and project.num_files_local == project.num_files_on_dropbox %}
@@ -137,6 +138,12 @@ $('#downloadfiles').click(function(event) {
         function(data) {
             document.location.reload();
     });    
+});
+$('#public').click(function(event) {
+    var checked = $('#public:checked').val()?'1':'0';
+    $.post('{% url 'project' project.pk %}',
+        {'csrfmiddlewaretoken': '{{csrf_token}}', 'public': checked }
+    );        
 });
 
 {% if project.file_path %}

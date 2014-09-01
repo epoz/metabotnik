@@ -42,6 +42,7 @@ class Project(models.Model):
     preview_height = models.IntegerField(default=0)
     metabotnik_width = models.IntegerField(default=0)
     metabotnik_height = models.IntegerField(default=0)
+    public = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.name if self.name else self.path

@@ -3,6 +3,7 @@ from django.core.urlresolvers import reverse
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseForbidden
+from django.db.models.query_utils import Q
 from django.conf import settings
 from dropbox.client import DropboxClient
 from metabotnik.models import Project, new_task
@@ -83,7 +84,13 @@ def project(request, project_id):
         templatename = 'project.html'
         if request.method == 'POST':
             newname = request.POST.get('name')
-            project.name = newname
+            if newname:
+                project.name = newname
+            public = request.POST.get('public')
+            if public == '1':
+                project.public = True
+            if public == '0':
+                project.public = False
             project.save()
     else:
         templatename = 'project_public.html'
@@ -92,8 +99,11 @@ def project(request, project_id):
 def projects(request):
     if request.GET.get('new_with_folder'):
         return new_project(request)
+    own = Q(user=request.user)
+    public = Q(public=True)
+    queryset = Project.objects.filter(own | public).exclude(status='deleted')
     return render(request, 'projects.html', 
-                  {'projects':Project.objects.exclude(status='deleted')})
+                  {'projects':queryset})
 
 @login_required
 def folders(request):
