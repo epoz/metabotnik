@@ -53,6 +53,18 @@ def generate(request, project_id):
     return HttpResponse(str(t.pk))
 
 @require_POST
+def getdropbox_project(request, project_id):
+    project = Project.objects.get(pk=project_id)
+    if project.user != request.user:
+        raise HttpResponseForbidden('Only the owner can request the fetching of Dropbox data for a project')
+    t = new_task(request.user, {
+                'action': 'download_dropboxfiles',
+                'project_id': project_id
+            })
+    project.set_status('downloading')
+    return HttpResponse(str(t.pk))
+
+@require_POST
 def delete_project(request, project_id):
     project = Project.objects.get(pk=project_id)
     if project.user != request.user:

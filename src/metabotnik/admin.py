@@ -19,7 +19,9 @@ class UserAdmin(UserAdmin):
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
-admin.site.register(Project)
+class ProjectAdmin(admin.ModelAdmin):
+    list_filter = ('status',)
+admin.site.register(Project, ProjectAdmin)
 
 class TaskAdmin(admin.ModelAdmin):
     list_display = ('action', 'status', 'user', 'created', 'time_ended')
