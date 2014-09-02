@@ -11,7 +11,7 @@
 <h3>Projects</h3>
 {% for p in projects %} <p style="margin: 0"><a href="{% url 'project' p.pk %}">{{p}}</a></p>{% endfor %}
 {% else %}
-<h1>You do not have any projects yet</h1>
+<h1>There are no projects to view yet</h1>
 {% endif %}
     
 {% endblock maincontent %}

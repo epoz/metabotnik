@@ -99,9 +99,10 @@ def project(request, project_id):
 def projects(request):
     if request.GET.get('new_with_folder'):
         return new_project(request)
-    own = Q(user=request.user)
-    public = Q(public=True)
-    queryset = Project.objects.filter(own | public).exclude(status='deleted')
+    criteria = Q(public=True)
+    if not request.user.is_anonymous():
+        criteria = criteria | Q(user=request.user)    
+    queryset = Project.objects.filter(criteria).exclude(status='deleted')
     return render(request, 'projects.html', 
                   {'projects':queryset})
 
