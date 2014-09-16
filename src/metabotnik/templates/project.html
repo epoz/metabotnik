@@ -42,6 +42,7 @@
     <div id="preview" class="openseadragon" style="height: 300px; margin-top: 40px"></div>
 
     <a href="#" id="savesection">Download Selection</a>
+    <div id="savedsections" style="display:none"></div>
 {% endif %}
 
 
@@ -76,12 +77,19 @@ function getDownloadProgress() {
 getDownloadProgress();
 
 $('#savesection').click(function(event) {
+    event.preventDefault();
+    var thelink = $(this);
+    thelink.hide();
     var slction = viewer1.viewport.viewportToImageRectangle( viewer1.viewport.getBounds() );
     $.post('{% url 'savesection' project.pk %}',
             {'csrfmiddlewaretoken': '{{csrf_token}}',
              'section': slction.x+' '+slction.y+' '+slction.width+' '+slction.height
             },
-            function(data) { document.location = data; }
+            function(data) { 
+                thelink.show();
+                $('#savedsections').show();
+                $('#savedsections').html('<a href="' + data + '">' + data + '</a> (NOTE: this could be a very large file)' );                
+            }
     );
 });
 
