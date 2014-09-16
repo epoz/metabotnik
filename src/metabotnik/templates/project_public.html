@@ -5,8 +5,12 @@
 
 {% if project.preview_width > 0 and project.preview_height > 0 %}
 <div id="preview" class="openseadragon" style="height: 600px; margin-top: 40px"></div>
-<a href="#" id="savesection" class="button">Download Selection</a>
-<div id="savedsections" style="display:none"></div>
+
+    {% if not user.is_anonymous %}
+    <a href="#" id="savesection" class="button">Download Selection</a>
+    <div id="savedsections" style="display:none"></div>
+    {% endif %}
+
 {% else %}
 <p>This project has not produced a metabotnik yet.</p>
 {% endif %}
