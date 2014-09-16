@@ -5,6 +5,8 @@
 
 {% if project.preview_width > 0 and project.preview_height > 0 %}
 <div id="preview" class="openseadragon" style="height: 600px; margin-top: 40px"></div>
+<a href="#" id="savesection" class="button">Download Selection</a>
+<div id="savedsections" style="display:none"></div>
 {% else %}
 <p>This project has not produced a metabotnik yet.</p>
 {% endif %}
@@ -34,6 +36,24 @@
         ]
         {% endif %}
     });
+
+$('#savesection').click(function(event) {
+    event.preventDefault();
+    var thelink = $(this);
+    thelink.hide();
+    $('#savedsections').show();
+    $('#savedsections').html('Please wait, making your selection...');
+    var slction = viewer1.viewport.viewportToImageRectangle( viewer1.viewport.getBounds() );
+    $.post('{% url 'savesection' project.pk %}',
+            {'csrfmiddlewaretoken': '{{csrf_token}}',
+             'section': slction.x+' '+slction.y+' '+slction.width+' '+slction.height
+            },
+            function(data) { 
+                thelink.show();                
+                $('#savedsections').html('<a href="' + data + '">' + data + '</a> (NOTE: this could be a very large file)' );                
+            }
+    );
+});
 {% endif %}
 
 {% endblock extra_javascript_end %}
