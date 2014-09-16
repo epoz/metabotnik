@@ -131,7 +131,11 @@ def folders(request):
         if x['is_dir']:
             folders.append(x)
             continue
-        if x['path'].lower().endswith('.jpg') and x['bytes'] > 0:
+        # skip really small files, they are probably bogus or in transit
+        if x['bytes'] < 1024:
+            continue
+        x_lower = x['path'].lower()
+        if x_lower.endswith('.jpg') or x_lower.endswith('.jpeg'):
             filesize_total += x['bytes']
             jpeg_files.append(x)
 
