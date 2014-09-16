@@ -94,6 +94,12 @@ def savesection(request, project_id):
         x = 0
     if y < 0:
         y = 0
+    # vips returns a 'bad extract area' if the width height is too big,
+    # so lets sanitize those too
+    if (project.metabotnik_width - x) < width:
+        width = project.metabotnik_width - x
+    if (project.metabotnik_height - y) < height:
+        height = project.metabotnik_height - y
 
     # Call VIPS to make the DZ
     input_filepath = os.path.join(project.storage_path, 'metabotnik.jpg')
