@@ -80,6 +80,7 @@ $('#savesection').click(function(event) {
     event.preventDefault();
     var thelink = $(this);
     thelink.hide();
+    $('#savedsections').show();
     $('#savedsections').html('Please wait, making your selection...');
     var slction = viewer1.viewport.viewportToImageRectangle( viewer1.viewport.getBounds() );
     $.post('{% url 'savesection' project.pk %}',
@@ -87,8 +88,7 @@ $('#savesection').click(function(event) {
              'section': slction.x+' '+slction.y+' '+slction.width+' '+slction.height
             },
             function(data) { 
-                thelink.show();
-                $('#savedsections').show();
+                thelink.show();                
                 $('#savedsections').html('<a href="' + data + '">' + data + '</a> (NOTE: this could be a very large file)' );                
             }
     );
