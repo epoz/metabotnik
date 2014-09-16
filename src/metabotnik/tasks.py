@@ -1,14 +1,15 @@
-from metabotnik.models import Project, new_task
+from metabotnik.models import Project, File, new_task
 from dropbox.client import DropboxClient
 import os
 import sys
 import subprocess
 import traceback
+import json
 from django.utils import timezone
-from django.conf import settings
 from django.core.mail import send_mail
 import planodo
 from PIL import Image
+from metabotnik.xmp import read_metadata
 
 class RetryTaskException(Exception):
     'Raise this Exception in a task to have it retried later'
@@ -112,7 +113,7 @@ def generate(payload):
                 'project_id': project.pk
         })
 
-    send_mail('Your generation task for project %s done' % project.pk, 'It can be viewed at https://metabotnik.com/projects/%s/' % project.pk, 
+    send_mail('Your generation task for project %s done' % project, 'It can be viewed at https://metabotnik.com/projects/%s/' % project.pk, 
                   'info@metabotnik.com', [project.user.email], fail_silently=False)
 
     project.set_status('layout')
@@ -125,6 +126,7 @@ def download_dropboxfiles(payload):
     # Check to see what files to download from Dropbox
     client = DropboxClient(project.user.dropboxinfo.access_token)
     folder_metadata = client.metadata(project.path)
+    num_files = 0
     for x in folder_metadata['contents']:
         if x['path'].lower().endswith('.jpg') and x['bytes'] > 0:
             # Download the file from Dropbox to local disk
@@ -134,8 +136,33 @@ def download_dropboxfiles(payload):
                 continue
             with client.get_file(x['path']) as f:
                 open(local_filepath, 'wb').write(f.read())
-
+            num_files += 1
+    
     # Downloading files can take a long time
     # In the meantime this Project could have been changed by other tasks
     # Reload it before setting the status
-    Project.objects.get(pk=payload['project_id']).set_status('layout')
+    project = Project.objects.get(pk=payload['project_id'])
+    project.num_files_local = num_files
+    project.status = 'layout'
+    project.save()
+
+def extract_metadata(payload):
+    project = Project.objects.get(pk=payload['project_id'])
+    current_files = {}
+    for image in project.files.all():
+        current_files[image.filename] = image
+    #  For every file, read the metadata
+    for filename in os.listdir(project.originals_path):
+        if not filename.endswith('.jpg'):
+            continue
+        filepath = os.path.join(project.originals_path, filename)
+        image = current_files.get(filename, 
+                    File(project=project, filename=filename)
+        )
+        tmp = read_metadata(filepath)
+        image.metadata = json.dumps(tmp)
+        # check the filesize
+        image.size = os.stat(filepath).st_size
+        # check the image size        
+        image.width, image.height = Image.open(filepath).size
+        image.save()

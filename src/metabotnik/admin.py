@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
-from metabotnik.models import DropBoxInfo, Project, Task
+from metabotnik.models import DropBoxInfo, Project, File, Task
 
 # Define an inline admin descriptor for Employee model
 # which acts a bit like a singleton
@@ -19,9 +19,16 @@ class UserAdmin(UserAdmin):
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
+class FileInline(admin.StackedInline):
+    model = File
+
 class ProjectAdmin(admin.ModelAdmin):
     list_filter = ('status',)
+    inlines = (FileInline, )
+    
 admin.site.register(Project, ProjectAdmin)
+
+admin.site.register(File)
 
 class TaskAdmin(admin.ModelAdmin):
     list_display = ('action', 'status', 'user', 'created', 'time_ended')

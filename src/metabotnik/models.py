@@ -90,6 +90,16 @@ class Project(models.Model):
         if os.path.exists(tmp):
             return tmp
 
+class File(models.Model):
+    project = models.ForeignKey(Project, related_name='files')
+    filename = models.CharField(max_length=250)
+    metadata = models.TextField(null=True, blank=True) # store a JSON blob of data
+    width = models.IntegerField(default=0)
+    height = models.IntegerField(default=0)
+    size = models.IntegerField(default=0) # filesize in bytes
+
+    def __unicode__(self):
+        return u'%s : %s' % (self.project, self.filename)
 
 task_status_choices = (
     ('new', 'New'),
