@@ -8,6 +8,17 @@ from django.conf import settings
 from dropbox.client import DropboxClient
 from metabotnik.models import Project, new_task
 import os
+import mimetypes
+import subprocess
+
+def s(request, path):
+    if not settings.DEBUG:
+        raise HttpResponseForbidden('Only works in development mode')
+    fullpath = os.path.join(settings.STORAGE_PATH, path)
+    if os.path.exists(fullpath):
+        type, encoding = mimetypes.guess_type(fullpath)
+        return HttpResponse(open(fullpath).read(), content_type=type)
+    return HttpResponseNotFound('%s not found' % path)
 
 def home(request):
     return render(request, 'index.html')
@@ -73,6 +84,26 @@ def delete_project(request, project_id):
     project.status = 'deleted'
     project.save()
     return HttpResponse('Deleted!')
+
+def savesection(request, project_id):
+    project = Project.objects.get(pk=project_id)
+    section = request.POST.get('section')
+    x, y, width, height = section.split(' ')    
+    x, y, width, height = int(float(x)), int(float(y)), int(float(width)), int(float(height))
+    if x < 0:
+        x = 0
+    if y < 0:
+        y = 0
+
+    # Call VIPS to make the DZ
+    input_filepath = os.path.join(project.storage_path, 'metabotnik.jpg')
+    section_filename = '%s_%s_%s_%s.jpg' % (x, y, width, height)
+    output_filepath = os.path.join(project.storage_path, section_filename)
+    if not os.path.exists(output_filepath):   
+        subprocess.call(['vips', 'crop', input_filepath, output_filepath, 
+                         str(x), str(y), str(width), str(height)])
+    
+    return HttpResponse('/s/project_%s/%s' % (project.pk, section_filename))
 
 def num_files_local(request, project_id):
     project = Project.objects.get(pk=project_id)

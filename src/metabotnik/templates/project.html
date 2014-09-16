@@ -40,6 +40,8 @@
 
 {% if project.preview_width > 0 and project.preview_height > 0 %}
     <div id="preview" class="openseadragon" style="height: 300px; margin-top: 40px"></div>
+
+    <a href="#" id="savesection">Download Selection</a>
 {% endif %}
 
 
@@ -72,6 +74,16 @@ function getDownloadProgress() {
     $('#num_files_local').html(tmp);
 }
 getDownloadProgress();
+
+$('#savesection').click(function(event) {
+    var slction = viewer1.viewport.viewportToImageRectangle( viewer1.viewport.getBounds() );
+    $.post('{% url 'savesection' project.pk %}',
+            {'csrfmiddlewaretoken': '{{csrf_token}}',
+             'section': slction.x+' '+slction.y+' '+slction.width+' '+slction.height
+            },
+            function(data) { document.location = data; }
+    );
+});
 
 $('#deleteproject').click(function(event) {
     event.preventDefault();

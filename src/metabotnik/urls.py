@@ -14,9 +14,13 @@ urlpatterns = patterns('',
     url(r'^projects/([0-9]+)/delete$', 'metabotnik.views.delete_project', name='delete_project'),
     url(r'^projects/([0-9]+)/getdropbox$', 'metabotnik.views.getdropbox_project', name='getdropbox_project'),
     url(r'^projects/([0-9]+)/num_files_local$', 'metabotnik.views.num_files_local', name='num_files_local'),
+    url(r'^projects/([0-9]+)/savesection$', 'metabotnik.views.savesection', name='savesection'),
 
     url(r'^projects/([0-9]+)/(\w+)/(preview)\.jpg$', 'metabotnik.views.projectpreview', name='preview'),
     url(r'^projects/([0-9]+)/(\w+)/(metabotnik)\.jpg$', 'metabotnik.views.projectpreview', name='metabotnik'),
+
+    # Only to be used in development and only works if DEBUG is True
+    url(r'^s/(.*)$', 'metabotnik.views.s'),
 
     # Authentication
     url(r'^login$', 'metabotnik.auth.loginview', name='login'),
