@@ -141,10 +141,7 @@ def download_dropboxfiles(payload):
     # Downloading files can take a long time
     # In the meantime this Project could have been changed by other tasks
     # Reload it before setting the status
-    project = Project.objects.get(pk=payload['project_id'])
-    project.num_files_local = num_files
-    project.status = 'layout'
-    project.save()
+    Project.objects.get(pk=payload['project_id']).set_status('layout')
 
 def extract_metadata(payload):
     project = Project.objects.get(pk=payload['project_id'])
