@@ -123,9 +123,14 @@ body {
 }
 
 #maincontent {
-    width: 75%;
+    width: 100%;
     margin: 0 auto 100px auto;
     padding-top: 80px;
+}
+#genbox {
+    width: 100%;
+    padding-left: 100px;
+    margin-top: 20px; background-color: #eee;
 }
 
 .conversionbutton {
@@ -144,6 +149,9 @@ body {
 .shout {
     padding: 30px; background-color: #ddd;
     text-align: center;
+}
+.spanhalf {
+    width: 45%; padding: 30px; float: right;
 }
 
 .browsefolders p {

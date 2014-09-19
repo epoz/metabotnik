@@ -2,6 +2,7 @@
 
 {% block maincontent %}
 
+<div style="padding: 30px">
 {% if not user.is_anonymous %}
 <a href="/folders/" class="conversionbutton">Create a new Project</a>    
 {% endif %}
@@ -14,4 +15,6 @@
 <h1>There are no projects to view yet</h1>
 {% endif %}
     
+</div>
+
 {% endblock maincontent %}

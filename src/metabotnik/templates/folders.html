@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
 {% block maincontent %}
+
+<div style="padding: 30px">
 <h2 style="margin:0"><a href="?path=/" title="Click here for the root of your Dropbox">My DropBox</a> &middot; {% for pathlink,pathfragment in pathsplit %}<a href="?path={{pathlink|urlencode}}">{{pathfragment}} / </a>{% endfor %}</h2>
 
 <p>Number of JPEG files <a target="_new" href="https://www.dropbox.com/home{{path|urlencode}}" title="View {{path}} on dropbox.com site">in this folder</a>: {{jpeg_files|length}} {% if jpeg_files|length > 0 %} (total size: {{filesize_total|filesizeformat}}){% endif %}</p>
@@ -18,4 +20,6 @@
 
 {% if jpeg_files|length > 0 %}
 <a href="/projects/?new_with_folder={{path|urlencode}}&filecount={{jpeg_files|length}}" class="conversionbutton" title="Use the {{jpeg_files|length}} images in this folder for a new project">Make Project</a>{% endif %}
+</div>
+
 {% endblock maincontent %}

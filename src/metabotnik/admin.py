@@ -33,4 +33,5 @@ admin.site.register(File)
 class TaskAdmin(admin.ModelAdmin):
     list_display = ('action', 'status', 'user', 'created', 'time_ended')
     list_filter = ('status',)
+    date_hierarchy = 'created'
 admin.site.register(Task, TaskAdmin)
