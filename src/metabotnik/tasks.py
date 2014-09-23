@@ -113,8 +113,9 @@ def generate(payload):
                 'project_id': project.pk
         })
 
-    send_mail('Your generation task for project %s done' % project, 'It can be viewed at https://metabotnik.com/projects/%s/' % project.pk, 
-                  'info@metabotnik.com', [project.user.email], fail_silently=False)
+    if payload.get('sendemail'):
+        send_mail('Your generation task for project %s done' % project, 'It can be viewed at https://metabotnik.com/projects/%s/' % project.pk, 
+                      'info@metabotnik.com', [project.user.email], fail_silently=False)
 
     project.set_status('layout')
 

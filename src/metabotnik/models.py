@@ -132,6 +132,7 @@ class Task(models.Model):
         return u'%s %s' % (self.action, self.user.email)
 
     def duration(self):
+        # This should be a timedelta of the self.time_ended - self.time_started
         return self.created
 
 def new_task(user, payload):
@@ -139,3 +140,8 @@ def new_task(user, payload):
     tmp = json.dumps(payload)
     action = payload.get('action')
     return Task.objects.create(action=action, payload_data=tmp, user=user)
+
+# class Viewpoint(models.Model):
+#     user = models.ForeignKey(User, related_name='tasks')
+#     project = models.ForeignKey(Project, related_name='files')
+# #    next = models.OneToOneField

@@ -10,7 +10,10 @@
 
 {% if projects %}
 <h3>Projects</h3>
-{% for p in projects %} <p style="margin: 0"><a href="{% url 'project' p.pk %}">{{p}}</a></p>{% endfor %}
+{% for p in projects %} <p style="margin: 0">
+    <a href="{% url 'project' p.pk %}">{{p}}</a> 
+    {% if user == p.user %}<a class="button buttonsmall" href="{% url 'edit_project' p.pk %}">edit</a>{% endif %}
+    </p>{% endfor %}
 {% else %}
 <h1>There are no projects to view yet</h1>
 {% endif %}
@@ -18,3 +21,4 @@
 </div>
 
 {% endblock maincontent %}
+

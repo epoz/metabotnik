@@ -123,7 +123,7 @@ $('#projectname_edit').keyup(function(event) {
         event.preventDefault();
         var name = $(this).val();
         $('#projectname_edit').hide();
-        $.post('{% url 'project' project.pk %}',
+        $.post('{% url 'edit_project' project.pk %}',
         {'csrfmiddlewaretoken': '{{csrf_token}}', 
          'name': name, 
         },
@@ -168,7 +168,7 @@ $('#downloadfiles').click(function(event) {
 });
 $('#public').click(function(event) {
     var checked = $('#public:checked').val()?'1':'0';
-    $.post('{% url 'project' project.pk %}',
+    $.post('{% url 'edit_project' project.pk %}',
         {'csrfmiddlewaretoken': '{{csrf_token}}', 'public': checked }
     );        
 });

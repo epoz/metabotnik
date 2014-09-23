@@ -117,8 +117,12 @@ def num_files_local(request, project_id):
 
 def project(request, project_id):
     project = Project.objects.get(pk=project_id)
-    if project.user == request.user:
-        templatename = 'project.html'
+    return render(request, 'project_public.html', {'project':project})
+
+def edit_project(request, project_id):
+    project = Project.objects.get(pk=project_id)
+    templatename = 'project.html'
+    if project.user == request.user:        
         if request.method == 'POST':
             newname = request.POST.get('name')
             if newname:
@@ -130,7 +134,7 @@ def project(request, project_id):
                 project.public = False
             project.save()
     else:
-        templatename = 'project_public.html'
+        return redirect(reverse('project', args=[project.pk]))
     return render(request, templatename, {'project':project})
 
 def projects(request):
