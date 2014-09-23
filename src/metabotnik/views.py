@@ -117,6 +117,8 @@ def num_files_local(request, project_id):
 
 def project(request, project_id):
     project = Project.objects.get(pk=project_id)
+    if not project.public and not project.user == request.user:
+        return HttpResponseNotFound()
     return render(request, 'project_public.html', {'project':project})
 
 def edit_project(request, project_id):
