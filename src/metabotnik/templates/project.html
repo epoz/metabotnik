@@ -17,6 +17,7 @@
         <a href="#" class="button" id="deleteproject">Delete this project</a>
         {% if project.status != 'downloading' %}
             <a href="#" class="button" id="downloadfiles">Re-sync Dropbox</a>
+
         {% endif %}
         <input {% if project.public %}checked="1" {% endif %}type="checkbox" id="public" title="If this is checked, all users can see this project"> Published 
     </div>
@@ -24,7 +25,7 @@
 
 <div id="genbox" style="{% if project.status == 'generating' or project.num_files_local != project.num_files_on_dropbox %}display: none;{% endif %}">
     <div style="position: absolute; right: 0; padding-right: 20px">
-        <input type="checkbox" id="sendemail"> Notify me via email when a task is completed
+        <input type="checkbox" id="sendemail" checked="1"> Notify me via email when a task is completed
     </div>
     
      <input type="radio" name="layout" value="horizontal"> horizontal layout<br>
@@ -86,7 +87,7 @@ getDownloadProgress();
 {% comment %} If we are doing a generation or dzgen, this takes a long time, so periodically refresh the page...    
 {% endcomment %}
 {% if project.status == 'generating' or project.status == 'dzgen' %}
-setTimeout(function() { document.location.reload(); }, 10000);
+setTimeout(function() { document.location = {% url 'projects' %}; }, 10000);
 {% endif %}
 
 $('#savesection').click(function(event) {
