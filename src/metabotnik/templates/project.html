@@ -5,7 +5,7 @@
 
 <h3 title="Click to change the name" id="projectname">{{project.name|default:"(currently nameless project, click here to give it a name )"}}</h3>
 <input title="Press Enter to save the new name" type="text" id="projectname_edit" style="display: none" size="75" placeholder="{{project.name|default:'Enter a project name'}}">
-<div>{{project.path}}</div>
+<div>Located in: Dropbox/Apps/Metabotnik{{project.path}}</div>
 <div>
     <div class="progress"><span id="num_files_local">Has {{project.num_files_on_dropbox}} files on Dropbox, and {{project.num_files_local}} downloaded</span></div>
 </div>
@@ -32,7 +32,7 @@
 
     <div style="margin-top: 10px">
     <a href="#" id="makepreview" class="conversionbutton">Make Low-Resolution</a>
-    {% if project.status != 'generating' %}        
+    {% if project.status != 'generating' and project.file_path %}        
         <a href="#" id="generate" class="conversionbutton" style="margin-top: 10px">Make Full-Resolution</a>
     {% endif %}
     </div>
@@ -40,12 +40,12 @@
 
 
 {% if project.preview_width > 0 and project.preview_height > 0 %}
-{% if not user.is_anonymous %}    
-<div style="padding: 30px 0 0 10px">
-        <a href="#" id="savesection" class="button">Download a Selection</a>
-        <div id="savedsections" style="display:none"></div>    
-</div>
-{% endif %}
+    {% if not user.is_anonymous %}    
+    <div style="padding: 30px 0 0 10px">
+            <a href="#" id="savesection" class="button">Download a Selection</a>
+            <div id="savedsections" style="display:none"></div>    
+    </div>
+    {% endif %}
 
 <div id="preview" class="openseadragon" style="height: 500px; margin-top: 10px"></div>
 {% endif %}
@@ -76,11 +76,18 @@ function getDownloadProgress() {
     } else {
         var tmp = 'All {{project.num_files_on_dropbox}} files retrieved from Dropbox';
         $('.progress').progressbar( "option", "value", 100 );
-        $('#genbox').show();
+        {% if project.status != 'generating' and project.status != 'dzgen' %} $('#genbox').show(); {% endif %}
+        
     }
     $('#num_files_local').html(tmp);
 }
 getDownloadProgress();
+
+{% comment %} If we are doing a generation or dzgen, this takes a long time, so periodically refresh the page...    
+{% endcomment %}
+{% if project.status == 'generating' or project.status == 'dzgen' %}
+setTimeout(function() { document.location.reload(); }, 10000);
+{% endif %}
 
 $('#savesection').click(function(event) {
     event.preventDefault();
@@ -151,9 +158,13 @@ $('#makepreview').click(function(event) {
     });
 });
 $('#generate').click(function(event) {
-    event.preventDefault();    
+    event.preventDefault();
+    var layout = $('input:radio[name=layout]:checked').val();
+    var sendemail = $('#sendemail').val();        
     $.post('{% url 'generate' project.pk %}', 
-        {'csrfmiddlewaretoken': '{{csrf_token}}'},
+        {'csrfmiddlewaretoken': '{{csrf_token}}', 
+         'layout': layout, 
+         'sendemail': $('#sendemail').is(':checked')},
         function(data) {
             document.location.reload();
     });

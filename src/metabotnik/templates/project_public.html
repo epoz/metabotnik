@@ -3,6 +3,9 @@
 {% block maincontent %}
 <div style="padding: 10px; ">
 <h3>{{project.name|default:"(currently nameless project)"}}</h3>
+{% if project.user == user %}
+<a class="button buttonsmall" href="{% url 'edit_project' project.pk %}">edit</a>
+{% endif %}
 </div>
 
 {% if project.preview_width > 0 and project.preview_height > 0 %}
