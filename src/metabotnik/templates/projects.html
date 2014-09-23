@@ -14,7 +14,7 @@
     <a href="{% url 'project' p.pk %}">{{p}}</a> 
     {% if user == p.user %}<a class="button buttonsmall" href="{% url 'edit_project' p.pk %}">edit</a>{% endif %}
     {% if not p.public %}<span style="font-size: 75%">(not publicly viewable yet)</span>{% endif %}
-    {% if project.status == 'generating' or project.status == 'dzgen' %}...being generated...{% endif %}
+    {% if p.status == 'generating' or p.status == 'dzgen' %}...being generated...{% endif %}
     </p>{% endfor %}
 {% else %}
 <h1>There are no projects to view yet</h1>
