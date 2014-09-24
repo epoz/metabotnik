@@ -14,6 +14,7 @@
     {% if user == p.user %}<a class="button buttonsmall" href="{% url 'edit_project' p.pk %}">edit</a>{% endif %}
     <span style="font-size: 75%"> {% if not p.public %}not public{% endif %}
     {% if p.status == 'generating' or p.status == 'dzgen' %}&middot; being generated{% endif %}</span>
+    &middot; {{p.storage_size|filesizeformat}}
     </p>{% endfor %}
 {% else %}
 <h1>There are no projects to view yet</h1>

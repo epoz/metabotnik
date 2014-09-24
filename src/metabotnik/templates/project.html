@@ -10,9 +10,7 @@
     <div class="progress"><span id="num_files_local">Has {{project.num_files_on_dropbox}} files on Dropbox, and {{project.num_files_local}} downloaded</span></div>
 </div>
 <div>Created on: {{project.created}}</div>
-<div>Status: {{project.status}} {% if project.status == 'generating' %}<img src="{{STATIC_URL}}/img/spinner.gif" title="Please wait, now generating your metabotnik">
-    
-{% endif %}</div>
+<div>Status: {{project.status}} {% if project.status == 'generating' %}<img src="{{STATIC_URL}}/img/spinner.gif" title="Please wait, now generating your metabotnik">{% endif %} Size: {{project.storage_size|filesizeformat}}</div>
     <div>
         <a href="sorting" class="button">Sorting</a>
         <a href="#" class="button" id="deleteproject">Delete this project</a>
