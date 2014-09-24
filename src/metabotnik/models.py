@@ -90,6 +90,7 @@ class Project(models.Model):
         if os.path.exists(tmp):
             return tmp
 
+
 class File(models.Model):
     project = models.ForeignKey(Project, related_name='files')
     filename = models.CharField(max_length=250)
@@ -97,6 +98,10 @@ class File(models.Model):
     width = models.IntegerField(default=0)
     height = models.IntegerField(default=0)
     size = models.IntegerField(default=0) # filesize in bytes
+    order = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ('order',)
 
     def __unicode__(self):
         return u'%s : %s' % (self.project, self.filename)
