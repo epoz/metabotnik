@@ -7,17 +7,20 @@
     <p>These are in the process of being asked - by you! Please mail us your questions, and we shall add them to this list: info@metabotnik.com</p>
 
     <div class="faqs">
-        <h3>Can I delete the files in my Dropbox once the metabotnik has been made?</h3>
-        <p>Yes! When you make a metabotnik, the files are copied from your Dropbox on to the Metabotnik server. You can then free up space on your Dropbox again if you like.</p>
-    
         <h3>Who can see my projects?</h3>
         <p>A metabotnik is only visible to other users once you tick the 'Published' box. You can uncheck it at any time to hide it again.</p>
-    
+
+        <h3>Can I delete the files in my Dropbox once the metabotnik has been made?</h3>
+        <p>Yes! When you make a metabotnik, the files are copied from your Dropbox on to the Metabotnik server. You can then free up space on your Dropbox again if you like. Watch out though: if you delete files in your own Dropbox and press the 'Re-sync Dropbox' button, the files will also be deleted from the Metabotnik server. Your generated metabotnik views will not be deleted until you delete the whole project though.</p>
+        
         <h3>How can I delete files on the server?</h3>
+        <p>Delete the file from your local Dropbox and then click on the 'Re-sync Dropbox' button in the edit screen of your project. Any files on the server which can not be found in your Dropbox will be deleted.</p>
     
         <h3>How can I add metadata and how will they show?</h3>
+        <p>This feature has not been implemented yet, we are working on it.</p>
 
         <h3>My images are rotated but they don't look like that in my metabotniks</h3>
+        <p>Some software (like Photoshop or the OS X Preview) do not rotate an image by actually moving the pixels around, but only set a property in the file saying: "rotate this file so many degrees when displaying it". When compliant software that understands this metadata displays the file it looks like it is rotated. The Metabotnik server works with the raw data, so if you want your images rotated you have to actually rotate them. Sorry about that.</p>
     </div>
 </div>
 {% endblock maincontent %}
