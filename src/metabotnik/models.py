@@ -1,9 +1,11 @@
 from django.db import models
+from django.dispatch.dispatcher import receiver
 from django.contrib.auth.models import User
 from django.conf import settings
 from datetime import datetime
 import json
 import os
+import shutil
 
 
 class DropBoxInfo(models.Model):
@@ -90,6 +92,9 @@ class Project(models.Model):
         if os.path.exists(tmp):
             return tmp
 
+@receiver(models.signals.post_delete, sender=Project)
+def project_delete(sender, instance, **kwargs):
+    shutil.rmtree(instance.storage_path, ignore_errors=True)
 
 class File(models.Model):
     project = models.ForeignKey(Project, related_name='files')
