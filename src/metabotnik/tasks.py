@@ -85,6 +85,7 @@ def generate(payload):
         if not original_files:
             return
         _, ROW_HEIGHT = Image.open( os.path.join(project.originals_path, original_files[0])).size
+        ROW_HEIGHT = max(ROW_HEIGHT, 4000)
         project.set_status('generating')
 
     if os.path.exists(filename):
