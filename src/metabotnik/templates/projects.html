@@ -9,12 +9,11 @@
 
 
 {% if projects %}
-<h3>Projects</h3>
 {% for p in projects %} <p style="margin: 0">
     <a href="{% url 'project' p.pk %}">{{p}}</a> 
     {% if user == p.user %}<a class="button buttonsmall" href="{% url 'edit_project' p.pk %}">edit</a>{% endif %}
-    {% if not p.public %}<span style="font-size: 75%">(not publicly viewable yet)</span>{% endif %}
-    {% if p.status == 'generating' or p.status == 'dzgen' %}...being generated...{% endif %}
+    <span style="font-size: 75%"> {% if not p.public %}not public{% endif %}
+    {% if p.status == 'generating' or p.status == 'dzgen' %}&middot; being generated{% endif %}</span>
     </p>{% endfor %}
 {% else %}
 <h1>There are no projects to view yet</h1>

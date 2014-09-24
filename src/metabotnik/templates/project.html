@@ -14,6 +14,7 @@
     
 {% endif %}</div>
     <div>
+        <a href="sorting" class="button">Sorting</a>
         <a href="#" class="button" id="deleteproject">Delete this project</a>
         {% if project.status != 'downloading' %}
             <a href="#" class="button" id="downloadfiles">Re-sync Dropbox</a>
@@ -41,7 +42,7 @@
 
 
 {% if project.preview_width > 0 and project.preview_height > 0 %}
-    {% if not user.is_anonymous %}    
+    {% if False and not user.is_anonymous %}    
     <div style="padding: 30px 0 0 10px">
             <a href="#" id="savesection" class="button">Download a Selection</a>
             <div id="savedsections" style="display:none"></div>    

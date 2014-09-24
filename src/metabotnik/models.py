@@ -58,6 +58,37 @@ class Project(models.Model):
                 'project_id': self.pk
             })
 
+    @property
+    def user_full_name(self):
+        return self.user.get_full_name()
+
+    def set_file_order(self, file_list):
+        # Given a list of file in file_list (which may contain blank lines too)
+        # Try to set the order of the files of this project to match the file_list order
+        if not file_list:
+            return # just bail if empty
+        current_files, incoming_files = {}, {}
+        for f in self.files.all():
+            current_files[f.filename] = f
+            f.order = 0
+            f.is_break = False
+        for i, filename in enumerate(file_list):
+            if filename:
+                incoming_files[i] = filename
+            else:
+                # if there is a break, find the _preceding_ file and set a break flag on it
+                break_filename_to_set = incoming_files[i-1]
+                break_file = current_files.get(break_filename_to_set)
+                if break_file:
+                    break_file.is_break = True
+            tmp_file = current_files.get(filename)
+            if tmp_file:
+                tmp_file.order = i
+
+        for f in current_files.values():
+            f.save()
+
+
     def set_status(self, status):
         self.status = status
         self.save()
@@ -104,6 +135,7 @@ class File(models.Model):
     height = models.IntegerField(default=0)
     size = models.IntegerField(default=0) # filesize in bytes
     order = models.IntegerField(default=0)
+    is_break = models.BooleanField(default=False) # indicates that a column/row should be broken after this file
 
     class Meta:
         ordering = ('order',)
@@ -125,6 +157,9 @@ class Task(models.Model):
     time_ended = models.DateTimeField(null=True, blank=True)
     status = models.CharField(max_length=100, choices=task_status_choices, default='new')
     payload_data = models.TextField()
+    # scheduled time when this should not be run before
+    # repeat count, default = 0
+    # project foreign key
 
     class Meta:
         ordering = ('created',)
@@ -144,6 +179,10 @@ class Task(models.Model):
     def duration(self):
         # This should be a timedelta of the self.time_ended - self.time_started
         return self.created
+
+    @property
+    def user_full_name(self):
+        return self.user.get_full_name()
 
 def new_task(user, payload):
     'Where payload is a dict containing the task details'

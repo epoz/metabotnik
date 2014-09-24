@@ -23,15 +23,16 @@ class FileInline(admin.StackedInline):
     model = File
 
 class ProjectAdmin(admin.ModelAdmin):
+    list_display = ('name', 'status', 'user_full_name', 'created')
     list_filter = ('status',)
-    inlines = (FileInline, )
+#    inlines = (FileInline, )
     
 admin.site.register(Project, ProjectAdmin)
 
 admin.site.register(File)
 
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ('action', 'status', 'user', 'created', 'time_ended')
+    list_display = ('action', 'status', 'user_full_name', 'created', 'time_ended')
     list_filter = ('status',)
     date_hierarchy = 'created'
 admin.site.register(Task, TaskAdmin)

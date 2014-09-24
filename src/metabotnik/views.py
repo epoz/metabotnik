@@ -140,11 +140,20 @@ def edit_project(request, project_id):
     return render(request, templatename, {'project':project})
 
 def metadata_project(request, project_id):
+    return sorting_project(request, project_id)
+
+def sorting_project(request, project_id):
     project = Project.objects.get(pk=project_id)
     if project.user != request.user:
         return redirect(reverse('project', args=[project.pk]))
+
+    # Use a POST to this method to save the sortorder of the files
+    if request.method == 'POST':
+        file_list = request.POST.get('file_list', u'').strip(' \n\r').split('\n')
+        project.set_file_order(file_list)
+
     textarea_rows = min(project.files.count(), 20)
-    return render(request, 'metadata.html', {'project':project, 'textarea_rows':textarea_rows}) 
+    return render(request, 'sorting.html', {'project':project, 'textarea_rows':textarea_rows}) 
 
 def projects(request):
     if request.GET.get('new_with_folder'):
