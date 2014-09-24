@@ -29,7 +29,9 @@ class ProjectAdmin(admin.ModelAdmin):
     
 admin.site.register(Project, ProjectAdmin)
 
-admin.site.register(File)
+class FileAdmin(admin.ModelAdmin):
+    list_display = ('project', 'filename', 'pretty_size', 'width', 'height')
+admin.site.register(File, FileAdmin)
 
 class TaskAdmin(admin.ModelAdmin):
     list_display = ('action', 'status', 'user_full_name', 'created', 'time_ended')

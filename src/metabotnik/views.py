@@ -35,7 +35,7 @@ def new_project(request):
     filecount = request.GET.get('filecount', 0)        
     project = Project.objects.create(path=path, user=request.user, num_files_on_dropbox=filecount)
     settings.STORAGE_PATH
-    url = reverse('project', args=[project.pk])
+    url = reverse('edit_project', args=[project.pk])
     return redirect(url)
 
 def projectpreview(request, project_id, hash, tipe):

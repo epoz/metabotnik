@@ -184,4 +184,3 @@ def extract_metadata(payload):
         # check the image size        
         image.width, image.height = Image.open(filepath).size
         image.save()
-        last_one = image

@@ -2,6 +2,7 @@ from django.db import models
 from django.dispatch.dispatcher import receiver
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.template.defaultfilters import filesizeformat
 from datetime import datetime
 import json
 import os
@@ -154,10 +155,13 @@ class File(models.Model):
     is_break = models.BooleanField(default=False) # indicates that a column/row should be broken after this file
 
     class Meta:
-        ordering = ('order',)
+        ordering = ('project', 'order')
 
     def __unicode__(self):
         return u'%s : %s' % (self.project, self.filename)
+
+    def pretty_size(self):
+        return filesizeformat(self.size)
 
 task_status_choices = (
     ('new', 'New'),
