@@ -139,6 +139,10 @@ def download_dropboxfiles(payload):
                 open(local_filepath, 'wb').write(f.read())
             num_files += 1
     
+    # Get the metadata as we are downloading the files,
+    # but it can be run as a separate task too.
+    extract_metadata(payload)
+
     # Downloading files can take a long time
     # In the meantime this Project could have been changed by other tasks
     # Reload it before setting the status
@@ -150,13 +154,15 @@ def extract_metadata(payload):
     for image in project.files.all():
         current_files[image.filename] = image
     #  For every file, read the metadata
-    for filename in os.listdir(project.originals_path):
+    order = 1
+    for filename in sorted(os.listdir(project.originals_path)):
         if not filename.endswith('.jpg'):
             continue
         filepath = os.path.join(project.originals_path, filename)
         image = current_files.get(filename, 
-                    File(project=project, filename=filename)
+                    File(project=project, filename=filename, order=order)
         )
+        order += 1
         tmp = read_metadata(filepath)
         image.metadata = json.dumps(tmp)
         # check the filesize
@@ -164,3 +170,4 @@ def extract_metadata(payload):
         # check the image size        
         image.width, image.height = Image.open(filepath).size
         image.save()
+        last_one = image

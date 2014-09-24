@@ -139,6 +139,13 @@ def edit_project(request, project_id):
         return redirect(reverse('project', args=[project.pk]))
     return render(request, templatename, {'project':project})
 
+def metadata_project(request, project_id):
+    project = Project.objects.get(pk=project_id)
+    if project.user != request.user:
+        return redirect(reverse('project', args=[project.pk]))
+    textarea_rows = min(project.files.count(), 20)
+    return render(request, 'metadata.html', {'project':project, 'textarea_rows':textarea_rows}) 
+
 def projects(request):
     if request.GET.get('new_with_folder'):
         return new_project(request)
