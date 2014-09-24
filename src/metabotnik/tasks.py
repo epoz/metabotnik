@@ -7,6 +7,7 @@ import traceback
 import json
 from django.utils import timezone
 from django.core.mail import send_mail
+from django.conf import settings
 import planodo
 from PIL import Image
 from metabotnik.xmp import read_metadata
@@ -28,10 +29,14 @@ def execute_task(task):
         task.time_started = timezone.now()
         task.save()
         try:
-            task_function(payload)
+            result = task_function(payload)
+            if type(result) is dict:
+                payload.update(result)
+            # consider taking the return value from the task_function, if it is a dict
+            # update the payload with the returned value
             task.status = 'done'
             task.time_ended = timezone.now()
-            task.save()
+            task.set_payload(payload)
             if sys.platform == 'darwin':
                 subprocess.call(['say', 'task %s done' % task.pk])
         except RetryTaskException, e:
@@ -41,7 +46,14 @@ def execute_task(task):
         except Exception:                
             payload['error'] = traceback.format_exc()
             task.status = 'error'
-            task.set_payload(payload)        
+            task.set_payload(payload)
+            # mail the error along
+            send_mail('An error occurred in task %s ' % task.pk, 
+                      '%s\nIt can be viewed at https://metabotnik.com/admin/metabotnik/task/%s/' % (payload['error'],task.pk), 
+                      'info@metabotnik.com', 
+                      [address for name, address in settings.ADMINS], 
+                      fail_silently=True)
+
     else:
         task.status = 'error'
         payload['error'] = 'Task %s is unrecognised' % task.action
@@ -148,6 +160,7 @@ def download_dropboxfiles(payload):
     # In the meantime this Project could have been changed by other tasks
     # Reload it before setting the status
     Project.objects.get(pk=payload['project_id']).set_status('layout')
+    return {'downloaded_files_count':num_files}
 
 def extract_metadata(payload):
     project = Project.objects.get(pk=payload['project_id'])
