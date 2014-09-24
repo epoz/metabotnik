@@ -137,6 +137,7 @@ def edit_project(request, project_id):
             project.save()
     else:
         return redirect(reverse('project', args=[project.pk]))
+    project.calc_storage_size()
     return render(request, templatename, {'project':project})
 
 def metadata_project(request, project_id):

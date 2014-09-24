@@ -45,15 +45,18 @@ class Project(models.Model):
     metabotnik_width = models.IntegerField(default=0)
     metabotnik_height = models.IntegerField(default=0)
     public = models.BooleanField(default=False)
+    storage_size = models.IntegerField(default=0)
 
-    def storage_size(self):
-        'Returns the number of bytes of storage used by this project'
+    def calc_storage_size(self):
+        'Returns the number of bytes of storage used by this project, sets the storage_size attribute'
         total = 0
         for dirpath, dirnames, filenames in os.walk(self.storage_path):
             for filename in filenames:
                 filepath = os.path.join(dirpath, filename)
                 tmp = os.stat(filepath).st_size
                 total += tmp
+        self.storage_size = total
+        self.save()
         return total
 
     def show(self):
