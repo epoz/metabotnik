@@ -23,7 +23,7 @@ class FileInline(admin.StackedInline):
     model = File
 
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ('name', 'status', 'user_full_name', 'created')
+    list_display = ('show', 'status', 'user_full_name', 'created')
     list_filter = ('status',)
 #    inlines = (FileInline, )
     

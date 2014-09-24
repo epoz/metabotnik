@@ -46,8 +46,11 @@ class Project(models.Model):
     metabotnik_height = models.IntegerField(default=0)
     public = models.BooleanField(default=False)
 
-    def __unicode__(self):
+    def show(self):
         return self.name if self.name else self.path
+
+    def __unicode__(self):
+        return self.show()
 
     def save(self, *args, **kwargs):
         super(Project, self).save(*args, **kwargs)
