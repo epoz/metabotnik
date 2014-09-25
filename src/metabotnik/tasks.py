@@ -146,11 +146,13 @@ def download_dropboxfiles(payload):
             # Download the file from Dropbox to local disk
             local_filename = os.path.split(x['path'].lower())[-1]
             local_filepath = os.path.join(project.originals_path, local_filename)
+            num_files += 1
             if os.path.exists(local_filepath): # and not payload.get('redownload') == True
                 continue
             with client.get_file(x['path']) as f:
                 open(local_filepath, 'wb').write(f.read())
-            num_files += 1
+    
+
     
     # Get the metadata as we are downloading the files,
     # but it can be run as a separate task too.
@@ -159,7 +161,10 @@ def download_dropboxfiles(payload):
     # Downloading files can take a long time
     # In the meantime this Project could have been changed by other tasks
     # Reload it before setting the status
-    Project.objects.get(pk=payload['project_id']).set_status('layout')
+    project = Project.objects.get(pk=payload['project_id'])
+    project.num_files_on_dropbox = num_files
+    project.status = 'layout'
+    project.save()
     return {'downloaded_files_count':num_files}
 
 def extract_metadata(payload):

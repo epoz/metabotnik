@@ -6,6 +6,10 @@
 <h3><a title="Edit project" href="{% url 'edit_project' project.pk %}">{{project.name|default:"(currently nameless project)"}}</a></h3>
 <div>Located in: Dropbox/Apps/Metabotnik{{project.path}}</div>
 
+<div style="float:right">
+{{canvas|safe}}
+</div>
+
 <h2 style="margin: 0">Sorting images</h2>
 
 <textarea rows="{{textarea_rows}}" style="float:left; margin-right: 20px" id="file_list">
@@ -42,7 +46,7 @@ $('#save_order').click(function(event) {
             'file_list': file_list
            },
            function(data) {
-                document.location = '{% url 'projects' %}';
+                document.location = '{% url 'sorting_project' project.pk %}';
            }
     );
 });

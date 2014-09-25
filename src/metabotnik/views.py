@@ -7,6 +7,7 @@ from django.db.models.query_utils import Q
 from django.conf import settings
 from dropbox.client import DropboxClient
 from metabotnik.models import Project, new_task
+from metabotnik.planodo import make_canvas
 import os
 import mimetypes
 import subprocess
@@ -152,9 +153,15 @@ def sorting_project(request, project_id):
     if request.method == 'POST':
         file_list = request.POST.get('file_list', u'').strip(' \n\r').split('\n')
         project.set_file_order(file_list)
+        return HttpResponse('OK')
+
+    canvas = make_canvas(project)
 
     textarea_rows = min(project.files.count(), 20)
-    return render(request, 'sorting.html', {'project':project, 'textarea_rows':textarea_rows}) 
+    return render(request, 'sorting.html', 
+                 {'project':project, 'textarea_rows':textarea_rows,
+                  'canvas': canvas
+                 }) 
 
 def projects(request):
     if request.GET.get('new_with_folder'):
