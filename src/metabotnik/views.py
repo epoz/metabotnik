@@ -155,12 +155,10 @@ def sorting_project(request, project_id):
         project.set_file_order(file_list)
         return HttpResponse('OK')
 
-    canvas = make_canvas(project)
-
     textarea_rows = min(project.files.count(), 20)
     return render(request, 'sorting.html', 
                  {'project':project, 'textarea_rows':textarea_rows,
-                  'canvas': canvas
+                  'canvas_script': make_canvas(project)
                  }) 
 
 def projects(request):

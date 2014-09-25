@@ -100,16 +100,17 @@ def make_by_rows(src, filename, row_width, row_height):
 
 def horzvert_layout(project):
     files = list(project.files.all())
-    ROW_HEIGHT = min(f.height for f in files)
+    # Allow overrriding the row_height by having a paramater passed in
+    row_height = min(f.height for f in files)
 
     # Calculate a new width/height for the files
     # based on making them all the same height
     # make_same_height
     for f in files:
-        f.new_height = ROW_HEIGHT
-        if f.height != ROW_HEIGHT:
+        f.new_height = row_height
+        if f.height != row_height:
             ratio = float(f.width)/float(f.height)
-            f.new_width = int(ROW_HEIGHT*ratio)
+            f.new_width = int(row_height*ratio)
         else:
             f.new_width = f.width
 
@@ -118,7 +119,7 @@ def horzvert_layout(project):
     # calc_row_width_height
     count_per_row = int(round(math.sqrt(len(files))))
     average_width = sum(f.new_width for f in files) / len(files)
-    row_height = sum(f.new_height for f in files) / len(files)
+    # row_height = sum(f.new_height for f in files) / len(files)
     row_width = count_per_row * average_width
 
     # Make the rows by calculating an offset for where the 
@@ -152,20 +153,13 @@ def horzvert_layout(project):
 
     return new_files, rows, row_width, row_height
 
-HTML = '''<canvas id="a" width="%(C_WIDTH)s" height="%(C_HEIGHT)s"></canvas>
-
-<script type="text/javascript">
-var canvas = document.getElementById("a");
+HTML = '''
+var canvas = document.getElementById("preview");
 var c = canvas.getContext("2d");
 c.font = "96pt sans-serif";
-c.fillStyle = "#eee";
-c.fillRect(0,0,%(C_WIDTH)s,%(C_HEIGHT)s);
-
 c.lineWidth = 2;
 c.scale(%(scale_x)s, %(scale_y)s);
 %(boxes)s
-
-</script>
 '''
 
 
@@ -190,11 +184,14 @@ def make_canvas(project):
         b('c.fillStyle = "#%s";' % (random_colour*3))
         b('c.fillRect(%s,%s,%s,%s);' % (f.x+offset, f.y, f.new_width, f.new_height))
         b('c.strokeRect(%s,%s,%s,%s);' % (f.x+offset, f.y, f.new_width, f.new_height))
-        b('c.fillStyle = "#fff";')
+        b('c.fillStyle = "#fff";')        
+        b('var img%s = document.createElement("img");' % f.pk)
+        b('img%s.src = "/s/project_%s/thumbnails/%s";' % (f.pk, project.pk, f.filename))
+        b('$(img%s).load(function() {c.drawImage(img%s, %s,%s,%s,%s);});' % (f.pk, f.pk, f.x+offset, f.y, f.new_width, f.new_height) )
         b('c.fillText("%s", %s, %s);' % (f.filename, f.x+offset+100, f.y+(f.new_height/10)))
-    tmp = HTML % {'C_WIDTH': C_WIDTH, 
-                  'C_HEIGHT': C_HEIGHT, 
-                  'scale_x': scale_x, 
+                
+
+    tmp = HTML % {'scale_x': scale_x, 
                   'scale_y': scale_y,
                   'boxes': '\n'.join(buf) }
 

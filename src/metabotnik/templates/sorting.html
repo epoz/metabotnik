@@ -7,10 +7,10 @@
 <div>Located in: Dropbox/Apps/Metabotnik{{project.path}}</div>
 
 <div style="float:right">
-{{canvas|safe}}
+  <canvas id="preview" width="500" height="500"></canvas>
 </div>
 
-<h2 style="margin: 0">Sorting images</h2>
+<h2 style="margin: 0">Sorting {{project.files.count}} images</h2>
 
 <textarea rows="{{textarea_rows}}" style="float:left; margin-right: 20px" id="file_list">
 {% for f in project.files.all %}{{f.filename}}
@@ -34,6 +34,9 @@
 {% endblock maincontent %}
 
 {% block extra_javascript_end %}
+
+{{canvas_script|safe}}
+
 $('#save_order').click(function(event) {
     event.preventDefault();
     var file_list = $('#file_list').val();
