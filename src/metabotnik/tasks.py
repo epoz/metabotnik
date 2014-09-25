@@ -67,7 +67,7 @@ def makethumbnails(payload):
     output_filepath = os.path.join(project.storage_path, 'thumbnails')
     if not os.path.exists(output_filepath):
         os.mkdir(output_filepath)
-    subprocess.call(['vipsthumbnail', '-o', '/%s.jpg'%output_filepath, '/%s.jpg'%project.originals_path])
+    subprocess.call(['vipsthumbnail', '-o', output_filepath+'/%s.jpg', '/%s.jpg'%project.originals_path])
 
 def makedeepzoom(payload):
     project = Project.objects.get(pk=payload['project_id'])    
