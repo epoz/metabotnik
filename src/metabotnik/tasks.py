@@ -63,10 +63,11 @@ def execute_task(task):
 
 def makethumbnails(payload):
     project = Project.objects.get(pk=payload['project_id'])
+
     output_filepath = os.path.join(project.storage_path, 'thumbnails')
     if not os.path.exists(output_filepath):
         os.mkdir(output_filepath)
-    subprocess.call(['vipsthumbnail', '-o', '/%s.jpg'%output_filepath, '/%s.jpg'%input_filepath])
+    subprocess.call(['vipsthumbnail', '-o', '/%s.jpg'%output_filepath, '/%s.jpg'%project.originals_path])
 
 def makedeepzoom(payload):
     project = Project.objects.get(pk=payload['project_id'])    
