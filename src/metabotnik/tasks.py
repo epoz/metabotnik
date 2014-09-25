@@ -61,6 +61,13 @@ def execute_task(task):
 
 # Defined tasks follow here ############################################################
 
+def makethumbnails(payload):
+    project = Project.objects.get(pk=payload['project_id'])
+    output_filepath = os.path.join(project.storage_path, 'thumbnails')
+    if not os.path.exists(output_filepath):
+        os.mkdir(output_filepath)
+    subprocess.call(['vipsthumbnail', '-o', '/%s.jpg'%output_filepath, '/%s.jpg'%input_filepath])
+
 def makedeepzoom(payload):
     project = Project.objects.get(pk=payload['project_id'])    
     project.set_status('dzgen')
