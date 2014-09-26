@@ -23,7 +23,7 @@ def execute_task(task):
 
         # Bit of fun on local development machine
         if sys.platform == 'darwin':
-            subprocess.call(['say', 'started task %s' % task.action])
+            subprocess.call(['say', 'started task %s' % task.pk])
 
         task.status = 'wip'
         task.time_started = timezone.now()
@@ -43,7 +43,10 @@ def execute_task(task):
             payload['error'] = 'Retrying %s' % e
             task.status = 'new'
             task.set_payload(payload)
-        except Exception:                
+        except Exception:
+            if sys.platform == 'darwin':
+                subprocess.call(['say', 'error in task %s' % task.pk])
+
             payload['error'] = traceback.format_exc()
             task.status = 'error'
             task.set_payload(payload)
@@ -64,10 +67,14 @@ def execute_task(task):
 def makethumbnails(payload):
     project = Project.objects.get(pk=payload['project_id'])
 
-    output_filepath = os.path.join(project.storage_path, 'thumbnails', '%s.jpg')
+    output_filepath = os.path.join(project.storage_path, 'thumbnails')
     if not os.path.exists(output_filepath):
         os.mkdir(output_filepath)
-    subprocess.call(['vipsthumbnail', '-o', output_filepath, project.originals_path+'/*.jpg'])
+    output_filepath += '/%s.jpg'
+
+    # this command does not run in a shell, so we need to supply the wildcard arguments
+    input_files = [os.path.join(project.originals_path, x) for x in os.listdir(project.originals_path) if x.lower().endswith('.jpg')]
+    subprocess.call(['vipsthumbnail', '-o', output_filepath]+input_files)
 
 def makedeepzoom(payload):
     project = Project.objects.get(pk=payload['project_id'])    
@@ -76,6 +83,9 @@ def makedeepzoom(payload):
     # Call VIPS to make the DZ
     input_filepath = os.path.join(project.storage_path, 'metabotnik.jpg')
     output_filepath = os.path.join(project.storage_path, 'deepzoom')
+
+    # At some point change this: first make the new pyramid files in a temp directory
+    # then remove the old one and renema the temp one to the regular location
 
     # rm the deepzoom folder
     subprocess.call(['rm', '-rf', os.path.join(project.storage_path, 'deepzoom_files')])
@@ -165,6 +175,13 @@ def download_dropboxfiles(payload):
     # Get the metadata as we are downloading the files,
     # but it can be run as a separate task too.
     extract_metadata(payload)
+
+    # schedule a thumbnail task
+    new_task(project.user, {
+        'action': 'makethumbnails',
+        'project_id': project.pk
+    })
+
 
     # Downloading files can take a long time
     # In the meantime this Project could have been changed by other tasks
