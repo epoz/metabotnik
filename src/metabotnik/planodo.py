@@ -178,6 +178,7 @@ def make_bitmap(project, filepath):
                 img.resize((f.new_width, f.new_height), Image.ANTIALIAS)
         except IOError:
             msgs.append('Problem with %s' % f.filename)
+            continue
         if img.mode == 'RGBA':
             large.paste(img, (f.x+offset, f.y), img)
         else:
