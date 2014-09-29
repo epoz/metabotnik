@@ -177,7 +177,7 @@ def make_bitmap(project, filepath):
             if i_width != f.new_width or i_height != f.new_height:
                 img.resize((f.new_width, f.new_height), Image.ANTIALIAS)
         except IOError:
-            msgs.append('Problem with', f.filename)
+            msgs.append('Problem with %s' % f.filename)
         if img.mode == 'RGBA':
             large.paste(img, (f.x+offset, f.y), img)
         else:
