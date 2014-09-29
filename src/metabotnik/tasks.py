@@ -76,6 +76,7 @@ def makethumbnails(payload):
     input_files = [os.path.join(project.originals_path, x) for x in os.listdir(project.originals_path) if x.lower().endswith('.jpg')]
     subprocess.call(['vipsthumbnail', '-o', output_filepath]+input_files)
 
+
 def makedeepzoom(payload):
     project = Project.objects.get(pk=payload['project_id'])    
     project.set_status('dzgen')

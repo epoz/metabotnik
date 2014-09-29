@@ -118,14 +118,14 @@ def num_files_local(request, project_id):
 
 def project(request, project_id):
     project = Project.objects.get(pk=project_id)
-    if not project.public and not project.user == request.user:
+    if not project.public and not project.user == request.user and not request.user.is_superuser:
         return HttpResponseNotFound()
     return render(request, 'project_public.html', {'project':project})
 
 def edit_project(request, project_id):
     project = Project.objects.get(pk=project_id)
     templatename = 'project.html'
-    if project.user == request.user:        
+    if project.user == request.user or request.user.is_superuser:        
         if request.method == 'POST':
             newname = request.POST.get('name')
             if newname:
@@ -146,7 +146,7 @@ def metadata_project(request, project_id):
 
 def sorting_project(request, project_id):
     project = Project.objects.get(pk=project_id)
-    if project.user != request.user:
+    if project.user != request.user and not request.user.is_superuser:
         return redirect(reverse('project', args=[project.pk]))
 
     # Use a POST to this method to save the sortorder of the files
@@ -167,7 +167,9 @@ def projects(request):
     criteria = Q(public=True)
     if not request.user.is_anonymous():
         criteria = criteria | Q(user=request.user)    
-    queryset = Project.objects.filter(criteria).exclude(status='deleted')
+    queryset = Project.objects.exclude(status='deleted')
+    if not request.user.is_superuser:
+        queryset = queryset.filter(criteria)
     return render(request, 'projects.html', 
                   {'projects':queryset})
 

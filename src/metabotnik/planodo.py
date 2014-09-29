@@ -153,6 +153,38 @@ def horzvert_layout(project):
 
     return new_files, rows, row_width, row_height
 
+def make_bitmap(project, filepath):
+    'Given the layout coordinates for @project, generate a bitmap and save it under @filename'
+    new_files, rows, row_width, row_height= horzvert_layout(project)
+
+    # Make the gigantic bitmap, if it is too large try and scale down the size using horzvert_layout iteratively
+    max_width= 65000
+    max_height = 65000
+
+    width, height = row_width, row_height*len(rows)
+    if width > 65000:
+        raise Exception('Width %s is > %s' % (width, max_width))
+    if height > 65000:
+        raise Exception('Height %s is > %s' % (height, max_height))
+
+    msgs = []
+    large = Image.new('RGBA', (width, height), color='white')
+    for f in new_files:
+        offset = (row_width - rows[f.row]) / 2
+        try:
+            img = Image.open(f.filename)
+            i_width, i_height = img.size
+            if i_width != f.new_width or i_height != f.new_height:
+                img.resize((f.new_width, f.new_height), Image.ANTIALIAS)
+        except IOError:
+            msgs.append('Problem with', f.filename)
+        if img.mode == 'RGBA':
+            large.paste(img, (f.x+offset, f.y), img)
+        else:
+            large.paste(img, (f.x+offset, f.y))
+    large.save(filepath)
+    return msgs
+
 HTML = '''
 var canvas = document.getElementById("preview");
 var c = canvas.getContext("2d");
