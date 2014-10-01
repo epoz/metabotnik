@@ -16,26 +16,28 @@
         <a href="#" class="button" id="deleteproject">Delete this project</a>
         {% if project.status != 'downloading' %}
             <a href="#" class="button" id="downloadfiles">Re-sync Dropbox</a>
-
         {% endif %}
         <input {% if project.public %}checked="1" {% endif %}type="checkbox" id="public" title="If this is checked, all users can see this project"> Published 
     </div>
 </div>
 
-<div id="genbox" style="{% if project.status == 'generating' or project.num_files_local != project.num_files_on_dropbox %}display: none;{% endif %}">
+<div id="genbox" style="{% if project.status == 'generating' or project.num_files_local != project.num_files_on_dropbox %}display: none;{% endif %} padding: 20px 0">
     <div style="position: absolute; right: 0; padding-right: 20px">
         <input type="checkbox" id="sendemail" checked="1"> Notify me via email when a task is completed
     </div>
     
-     <input type="radio" name="layout" value="horizontal"> horizontal layout<br>
-     <input type="radio" name="layout" value="vertical"> vertical layout
+    <div style="width: 400px; float:left; padding-left: 20px">
+         <input type="radio" name="layout" value="horizontal"> horizontal layout<br>
+         <input type="radio" name="layout" value="vertical"> vertical layout<br>
+         <input type="radio" name="layout" value="random"> random layout<br>
+    </div>
 
-    <div style="margin-top: 10px">
-    <a href="#" id="makepreview" class="conversionbutton">Make Low-Resolution</a>
-    {% if project.status != 'generating' and project.file_path %}        
-        <a href="#" id="generate" class="conversionbutton" style="margin-top: 10px">Make Full-Resolution</a>
+    <div style="margin-top: 10px; height: 70px">
+    {% if project.status != 'generating' %}        
+        <a href="#" id="generate" class="conversionbutton" style="margin-top: 10px">Make the metabotnik</a>
     {% endif %}
     </div>
+
 </div>
 
 
@@ -184,7 +186,7 @@ $('#public').click(function(event) {
     );        
 });
 
-{% if project.file_path %}
+{% if project.metabotnik_path %}
     var viewer1 = OpenSeadragon({
         id:            "preview",
         maxZoomPixelRatio: 100,

@@ -74,7 +74,7 @@ def makethumbnails(payload):
 
     # this command does not run in a shell, so we need to supply the wildcard arguments
     input_files = [os.path.join(project.originals_path, x) for x in os.listdir(project.originals_path) if x.lower().endswith('.jpg')]
-    subprocess.call(['vipsthumbnail', '-o', output_filepath]+input_files)
+    subprocess.call(['%svipsthumbnail'%settings.VIPSBIN_PATH, '-o', output_filepath]+input_files)
 
 
 def makedeepzoom(payload):
@@ -90,12 +90,12 @@ def makedeepzoom(payload):
 
     # rm the deepzoom folder
     subprocess.call(['rm', '-rf', os.path.join(project.storage_path, 'deepzoom_files')])
-    subprocess.call(['vips', 'dzsave', input_filepath, output_filepath, '--suffix', '.jpg'])
+    subprocess.call(['%svips'%settings.VIPSBIN_PATH, 'dzsave', input_filepath, output_filepath, '--suffix', '.jpg'])
 
     project.set_status('done')
 
 
-def generate(payload):    
+def generate(payload):
     project = Project.objects.get(pk=payload['project_id'])
     # Check to see if the number of files retrieved from Dropbox is done yet.
     # If not, just reset this task to new and return
@@ -106,50 +106,28 @@ def generate(payload):
     if payload.get('preview'):
         filename = os.path.join(project.storage_path, 'preview.jpg')
         # For Previews, an arbitrary size
-        ROW_HEIGHT = 200
+        # We need to add setting preview size to layouter...
         project.set_status('previewing')
     else:
-        filename = os.path.join(project.storage_path, 'metabotnik.jpg')
-        # When generating the actual metabotnik, make all the originals the same height as 
-        # the first file found
-        original_files = [x for x in os.listdir(project.originals_path) if x.endswith('.jpg')]
-        if not original_files:
-            return
-        _, ROW_HEIGHT = Image.open( os.path.join(project.originals_path, original_files[0])).size
-        ROW_HEIGHT = max(ROW_HEIGHT, 4000)
+        filename = os.path.join(project.storage_path, 'metabotnik.jpg')    
         project.set_status('generating')
 
-    if os.path.exists(filename):
-        os.remove(filename)
+    error_msgs = planodo.make_bitmap(project, filename)
 
 
-    # Make all the originals the same height
-    working = os.path.join(project.storage_path, 'wip')
-    planodo.make_images_sameheight(project.originals_path, working, ROW_HEIGHT)
-
-    # Calculate a row_width, row_height based on layout, widest, sqrt numbr of files etc.
-    row_width, row_height = planodo.calc_row_width_height(working)
-
-    # Make the rows
-    rows = os.path.join(project.storage_path, 'wip', 'rows')
-    planodo.make_rows(working, rows,  row_width, row_height)
-
-    # Make the final
-    theimage = planodo.make_by_rows(rows, filename, row_width, row_height)
-    if payload.get('preview'):
-        project.preview_width, project.preview_height = theimage.size
-    else:
-        project.metabotnik_width, project.metabotnik_height = theimage.size        
-        new_task(project.user, {
-                'action': 'makedeepzoom',
-                'project_id': project.pk
-        })
+    new_task(project.user, {
+            'action': 'makedeepzoom',
+            'project_id': project.pk
+    })
 
     if payload.get('sendemail'):
         send_mail('Your generation task for project %s done' % project, 'It can be viewed at https://metabotnik.com/projects/%s/' % project.pk, 
                       'info@metabotnik.com', [project.user.email], fail_silently=False)
 
     project.set_status('layout')
+
+    if error_msgs:
+        return {'error': error_msgs}
 
 def download_dropboxfiles(payload):
     # Get the Project

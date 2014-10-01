@@ -19,7 +19,6 @@ project_status_choices = (
     ('downloading', 'Busy Downloading Files'),
     ('layout', 'Needs Layout'),
     ('preview', 'Has a Preview'),
-    ('previewing', 'Busy Previewing'),
     ('generating', 'Busy Generating'),
     ('dzgen', 'Busy Making DeepZoom'),
     ('done', 'Done'),
@@ -27,7 +26,8 @@ project_status_choices = (
 )
 project_layout_choices = (
     ('horizontal', 'horizontal'),
-    ('vertical', 'vertical')
+    ('vertical', 'vertical'),
+    ('random', 'random')
 )
 class Project(models.Model):
     name = models.CharField(max_length=250, blank=True)
@@ -126,14 +126,10 @@ class Project(models.Model):
     def num_files_local(self):
         return len([f for f in os.listdir(self.originals_path) if f.lower().endswith('.jpg')])
 
-    def file_path(self, tipe='preview'):
-        tmp = os.path.join(self.storage_path, '%s.jpg' % tipe)
+    def metabotnik_path(self):
+        tmp = os.path.join(self.storage_path, 'metabotnik.jpg')
         if os.path.exists(tmp):
             return tmp
-    # Following a bit of a weird construct, 
-    # needed due to template not being able to call a method with an argument
-    def file_path_metabotnik(self):
-        return self.file_path(tipe='metabotnik')
 
     def deepzoom(self):
         tmp = os.path.join(self.storage_path, 'deepzoom_files')

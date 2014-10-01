@@ -101,7 +101,7 @@ def make_by_rows(src, filename, row_width, row_height):
 def horzvert_layout(project):
     files = list(project.files.all())
     # Allow overrriding the row_height by having a paramater passed in
-    row_height = min(f.height for f in files)
+    row_height = sum(f.height for f in files) / len(files)
 
     # Calculate a new width/height for the files
     # based on making them all the same height
@@ -172,7 +172,7 @@ def make_bitmap(project, filepath):
     for f in new_files:
         offset = (row_width - rows[f.row]) / 2
         try:
-            img = Image.open(f.filename)
+            img = Image.open(os.path.join(project.originals_path, f.filename))
             i_width, i_height = img.size
             if i_width != f.new_width or i_height != f.new_height:
                 img.resize((f.new_width, f.new_height), Image.ANTIALIAS)
@@ -183,7 +183,10 @@ def make_bitmap(project, filepath):
             large.paste(img, (f.x+offset, f.y), img)
         else:
             large.paste(img, (f.x+offset, f.y))
+
     large.save(filepath)
+    project.metabotnik_width, project.metabotnik_height = large.size
+
     return msgs
 
 HTML = '''

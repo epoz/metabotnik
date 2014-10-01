@@ -19,9 +19,6 @@ urlpatterns = patterns('',
     url(r'^projects/([0-9]+)/num_files_local$', 'metabotnik.views.num_files_local', name='num_files_local'),
     url(r'^projects/([0-9]+)/savesection$', 'metabotnik.views.savesection', name='savesection'),
 
-    url(r'^projects/([0-9]+)/(\w+)/(preview)\.jpg$', 'metabotnik.views.projectpreview', name='preview'),
-    url(r'^projects/([0-9]+)/(\w+)/(metabotnik)\.jpg$', 'metabotnik.views.projectpreview', name='metabotnik'),
-
     # Only to be used in development and only works if DEBUG is True
     url(r'^s/(.*)$', 'metabotnik.views.s'),
 

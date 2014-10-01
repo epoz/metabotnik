@@ -39,16 +39,6 @@ def new_project(request):
     url = reverse('edit_project', args=[project.pk])
     return redirect(url)
 
-def projectpreview(request, project_id, hash, tipe):
-    # Why the hash param?
-    # It is basically ignored it can be any characters, but we are adding it to do cache-busting
-    # othwerwise browsers would not display the /preview.jpg file again.
-    # There is probably a better way to do this using some form of HTTP header, but yeah, TODO...
-    project = Project.objects.get(pk=project_id)
-    if project.file_path(tipe):
-        return HttpResponse(open(project.file_path(tipe)), mimetype='image/jpg')
-    return HttpResponseNotFound()
-
 @require_POST
 def generate(request, project_id):
     preview = True if request.POST.get('preview') else False
@@ -68,8 +58,8 @@ def generate(request, project_id):
 @require_POST
 def getdropbox_project(request, project_id):
     project = Project.objects.get(pk=project_id)
-    if project.user != request.user:
-        raise HttpResponseForbidden('Only the owner can request the fetching of Dropbox data for a project')
+    if project.user != request.user and not request.user.is_superuser:
+        return HttpResponseForbidden('Only the owner can request the fetching of Dropbox data for a project')
     t = new_task(request.user, {
                 'action': 'download_dropboxfiles',
                 'project_id': project_id
