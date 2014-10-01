@@ -175,7 +175,7 @@ def make_bitmap(project, filepath):
             img = Image.open(os.path.join(project.originals_path, f.filename))
             i_width, i_height = img.size
             if i_width != f.new_width or i_height != f.new_height:
-                img.resize((f.new_width, f.new_height), Image.ANTIALIAS)
+                img = img.resize((f.new_width, f.new_height), Image.ANTIALIAS)
         except IOError:
             msgs.append('Problem with %s' % f.filename)
             continue
