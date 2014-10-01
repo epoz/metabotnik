@@ -101,7 +101,7 @@ def make_by_rows(src, filename, row_width, row_height):
 def horzvert_layout(project):
     files = list(project.files.all())
     # Allow overrriding the row_height by having a paramater passed in
-    row_height = sum(f.height for f in files) / len(files)
+    row_height = min(f.height for f in files)
 
     # Calculate a new width/height for the files
     # based on making them all the same height
