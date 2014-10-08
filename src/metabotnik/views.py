@@ -7,10 +7,12 @@ from django.db.models.query_utils import Q
 from django.conf import settings
 from dropbox.client import DropboxClient
 from metabotnik.models import Project, new_task
-from metabotnik.planodo import make_canvas
+from metabotnik.planodo import horzvert_layout
 import os
 import mimetypes
 import subprocess
+import json
+import random
 
 def s(request, path):
     if not settings.DEBUG:
@@ -35,7 +37,11 @@ def new_project(request):
                       {'message': 'No path specified for the new project?'})
     filecount = request.GET.get('filecount', 0)        
     project = Project.objects.create(path=path, user=request.user, num_files_on_dropbox=filecount)
-    settings.STORAGE_PATH
+    new_task(request.user, {
+        'action': 'download_dropboxfiles',
+        'project_id': project.pk
+    })
+
     url = reverse('edit_project', args=[project.pk])
     return redirect(url)
 
@@ -110,6 +116,8 @@ def project(request, project_id):
     project = Project.objects.get(pk=project_id)
     if not project.public and not project.user == request.user and not request.user.is_superuser:
         return HttpResponseNotFound()
+    if request.GET.get('kaal'):
+        return render(request, 'project_kaal.html', {'project':project})
     return render(request, 'project_public.html', {'project':project})
 
 def edit_project(request, project_id):
@@ -131,6 +139,33 @@ def edit_project(request, project_id):
     project.calc_storage_size()
     return render(request, templatename, {'project':project})
 
+@require_POST
+def json_project(request, project_id):
+    project = Project.objects.get(pk=project_id)
+    if project.user != request.user and not request.user.is_superuser:
+        return redirect(reverse('project', args=[project.pk]))
+
+    layout = request.POST.get('layout', 'horizontal')
+    frame = request.POST.get('frame', '0')
+    background_color = request.POST.get('background_color', '#fff')
+    
+    width, height = horzvert_layout(project, layout=layout, frame=frame)
+    project.layout_mode = layout
+    project.background_color = background_color
+    project.metabotnik_width = width
+    project.metabotnik_height = height
+    project.save()
+
+    data = {'width':width, 'height':height }    
+    data['images']  = []
+    for f in project.files.all():
+        random_colour = '%x' % random.randint(0,180)
+        tmp = {'x':f.x, 'y':f.y, 'width':f.new_width, 'height':f.new_height, 
+               'filename':f.filename, 'fill_style': '#%s' % (random_colour*3)}
+        data['images'].append(tmp)
+    return HttpResponse(json.dumps(data), content_type='application/json')
+
+
 def metadata_project(request, project_id):
     return sorting_project(request, project_id)
 
@@ -147,8 +182,7 @@ def sorting_project(request, project_id):
 
     textarea_rows = min(project.files.count(), 20)
     return render(request, 'sorting.html', 
-                 {'project':project, 'textarea_rows':textarea_rows,
-                  'canvas_script': make_canvas(project)
+                 {'project':project, 'textarea_rows':textarea_rows
                  }) 
 
 def projects(request):

@@ -21,22 +21,33 @@
     </div>
 </div>
 
-<div id="genbox" style="{% if project.status == 'generating' or project.num_files_local != project.num_files_on_dropbox %}display: none;{% endif %} padding: 20px 0">
-    <div style="position: absolute; right: 0; padding-right: 20px">
-        <input type="checkbox" id="sendemail" checked="1"> Notify me via email when a task is completed
-    </div>
-    
-    <div style="width: 400px; float:left; padding-left: 20px">
-         <input type="radio" name="layout" value="horizontal"> horizontal layout<br>
+
+<div id="genbox" style="{% if project.status == 'generating' or project.num_files_local != project.num_files_on_dropbox %}display: none;{% endif %} padding: 20px 0; width: 100%; height: 520px">
+   
+
+    <div style="width: 400px; float:left; padding-left: 40px">
+         <input type="radio" name="layout" value="horizontal" checked="1"> horizontal layout<br>
          <input type="radio" name="layout" value="vertical"> vertical layout<br>
          <input type="radio" name="layout" value="random"> random layout<br>
-    </div>
+         <select id="background_color">
+            <option value="#fff">white background</option>
+            <option value="#000">black background</option>
+         </select>
+         {% comment %}
+         &nbsp;&nbsp;&nbsp;frame: <input id="frame" type="text" size="4" value="0">   
+         {% endcomment %}
+         <br><br><br>          
+         <input type="checkbox" id="sendemail" checked="1"> Notify me via email when a task is completed
 
-    <div style="margin-top: 10px; height: 70px">
-    {% if project.status != 'generating' %}        
+        {% if project.status != 'generating' %}        
         <a href="#" id="generate" class="conversionbutton" style="margin-top: 10px">Make the metabotnik</a>
     {% endif %}
     </div>
+
+    <div style="left: 500px; position: absolute">
+        <canvas id="preview" width="500" height="500"></canvas>
+    </div>
+
 
 </div>
 
@@ -56,6 +67,57 @@
 {% endblock maincontent %}
 
 {% block extra_javascript_end %}
+var canvas = document.getElementById("preview");
+var c = canvas.getContext("2d");
+c.save();
+c.fillStyle = "#fff";
+c.fillRect(0,0,500,500);
+var img_data = [];
+
+function drawImage(img) {
+    c.fillStyle = img.fill_style;
+    c.fillRect(img.x,img.y,img.width,img.height);
+    var img_element = document.createElement("img");
+    img_element.src = "/s/project_{{project.pk}}/thumbnails/" + img.filename;
+    $(img_element).load(function() { 
+        c.drawImage(img_element,img.x,img.y,img.width,img.height);
+    });    
+}
+function drawCanvas() {
+    c.restore();
+    c.save();
+    c.fillStyle = $('#background_color').val();
+    c.fillRect(0,0,canvas.width,canvas.height);
+
+    var scale_x = canvas.width / img_data.width;
+    var scale_y = canvas.height / img_data.height;
+    c.scale(scale_x, scale_y);
+
+    for (var i = 0; i < img_data.images.length; i++) {
+        drawImage(img_data.images[i]);
+    }
+}
+function updateCanvas() {
+    var frame = $('#frame').val();
+    if(!frame) {
+        frame = '0';
+    }
+
+    $.post('{% url 'json_project' project.pk %}', 
+          {'layout': $('input:radio[name=layout]:checked').val(),
+           'frame': frame, 'csrfmiddlewaretoken': '{{csrf_token}}',
+           'background_color': $('#background_color').val()
+          }, 
+    function(data) {
+        img_data = data;
+        drawCanvas();
+    });
+}
+$('input:radio').click(function(event) {
+    updateCanvas();
+});
+
+
 var num_files_local = {{project.num_files_local}};
 var num_files_on_dropbox = {{project.num_files_on_dropbox}};
 $(".progress").each(function() {
@@ -74,7 +136,7 @@ function getDownloadProgress() {
             $('.progress').progressbar( "option", "value", num_files_local/num_files_on_dropbox*100 );
         }        
         var tmp = 'Has {{project.num_files_on_dropbox}} files on Dropbox, and ' + num_files_local + ' downloaded';
-        setTimeout(getDownloadProgress, 1000);
+        setTimeout(getDownloadProgress, 2000);
     } else {
         var tmp = 'All {{project.num_files_on_dropbox}} files retrieved from Dropbox';
         $('.progress').progressbar( "option", "value", 100 );

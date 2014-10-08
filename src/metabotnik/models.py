@@ -41,6 +41,7 @@ class Project(models.Model):
     num_files_on_dropbox = models.IntegerField(default=0)
     created = models.DateTimeField(auto_now_add=True)
     layout_mode = models.CharField(max_length=100, choices=project_layout_choices, default='horizontal')
+    background_color = models.CharField(max_length=7, default='#ffffff')
     preview_width = models.IntegerField(default=0)
     preview_height = models.IntegerField(default=0)
     metabotnik_width = models.IntegerField(default=0)
@@ -65,15 +66,6 @@ class Project(models.Model):
 
     def __unicode__(self):
         return self.show()
-
-    def save(self, *args, **kwargs):
-        super(Project, self).save(*args, **kwargs)
-        # Famous last words: these payloads need more stucture, but let's not over-engineer yet...
-        if self.status == 'new':
-            new_task(self.user, {
-                'action': 'download_dropboxfiles',
-                'project_id': self.pk
-            })
 
     @property
     def user_full_name(self):
@@ -146,6 +138,10 @@ class File(models.Model):
     metadata = models.TextField(null=True, blank=True) # store a JSON blob of data
     width = models.IntegerField(default=0)
     height = models.IntegerField(default=0)
+    x = models.IntegerField(default=0) # And record the position
+    y = models.IntegerField(default=0)
+    new_width = models.IntegerField(default=0) # When doing a layout images need to be resized...
+    new_height = models.IntegerField(default=0)
     size = models.IntegerField(default=0) # filesize in bytes
     order = models.IntegerField(default=0)
     is_break = models.BooleanField(default=False) # indicates that a column/row should be broken after this file

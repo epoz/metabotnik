@@ -114,7 +114,6 @@ def generate(payload):
 
     error_msgs = planodo.make_bitmap(project, filename)
 
-
     new_task(project.user, {
             'action': 'makedeepzoom',
             'project_id': project.pk
