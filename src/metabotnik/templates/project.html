@@ -34,6 +34,7 @@
             <option value="#000">black background</option>
          </select><br><br>
          <a class="button" id="makepreview" href="#">Preview</a>
+         <div id="previewspinner"  style="display:none; width:100%; background-color: #fff; padding: 0 40px">making a preview...<img src="{{STATIC_URL}}/img/spinner.gif"></div>         
          {% comment %}
          &nbsp;&nbsp;&nbsp;frame: <input id="frame" type="text" size="4" value="0">   
          {% endcomment %}
@@ -112,11 +113,13 @@ function updateCanvas() {
     function(data) {
         img_data = data;
         drawCanvas();
+        $('#previewspinner').hide();
         $('#makepreview').show();
     });
 }
 $('#makepreview').click(function(event) {
     $(this).hide();
+    $('#previewspinner').show();
     event.preventDefault();
     updateCanvas();    
 });
