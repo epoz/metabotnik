@@ -1,0 +1,82 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- Place favicon.ico and apple-touch-icon(s) in the root directory -->
+
+        <link rel="stylesheet" href="{{STATIC_URL}}css/normalize.css">
+        <link rel="stylesheet" href="{{STATIC_URL}}css/main2.css">
+        <script src="{{STATIC_URL}}js/vendor/modernizr-2.8.0.min.js"></script>
+        <script type="text/javascript" src="{{STATIC_URL}}openseadragon/openseadragon.min.js"></script>
+        <link href='https://fonts.googleapis.com/css?family=Ubuntu' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}jquery.ui/jquery-ui.min.css">
+    </head>
+    <body>
+        <!--[if lt IE 8]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+{% if project.metabotnik_path %}
+<div id="preview" class="openseadragon" style="height: 200px"></div>
+{% else %}
+<p>This project has not produced a metabotnik yet.</p>
+{% endif %}
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="{{STATIC_URL}}js/vendor/jquery-1.11.1.min.js"><\/script>')</script>
+        <script src="{{STATIC_URL}}js/plugins.js"></script>
+        <script src="{{STATIC_URL}}js/main.js"></script>
+
+        <script src="//code.jquery.com/ui/1.11.1/jquery-ui.min.js"></script>
+        <script>window.jQuery.ui || document.write('<script src="{{STATIC_URL}}jquery.ui/jquery-ui.min.js"><\/script>')</script>
+
+
+        <script type="text/javascript">
+        {% if project.metabotnik_path %}
+
+
+
+    var viewer1 = OpenSeadragon({
+        id:            "preview",
+        maxZoomPixelRatio: 100,
+        prefixUrl:     '{{STATIC_URL}}openseadragon/images/',
+        showNavigator:  false,
+        {% if project.deepzoom %}
+        tileSources: "/s/project_{{project.pk}}/deepzoom.dzi"
+        {% else %}
+        tileSources: [
+            {
+                type: 'legacy-image-pyramid',
+                levels: [{"url": "{{csrf_token}}/preview.jpg", 
+                          "width": {{project.preview_width}},         
+                          "height": {{project.preview_height}}
+                         }
+                ]
+            }
+        ]
+        {% endif %}
+    });
+    $(window).resize(function() {
+        $('#preview').height( window.innerHeight );        
+    });
+{% endif %}
+
+
+        </script>
+
+        <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. >
+        <script>
+            (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+            function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+            e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+            e.src='//www.google-analytics.com/analytics.js';
+            r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+            ga('create','UA-XXXXX-X','auto');ga('send','pageview');
+        </script-->
+    </body>
+</html>
