@@ -7,7 +7,7 @@ from datetime import datetime
 import json
 import os
 import shutil
-
+import random
 
 class DropBoxInfo(models.Model):
     user = models.OneToOneField(User, primary_key=True)
@@ -48,6 +48,16 @@ class Project(models.Model):
     metabotnik_height = models.IntegerField(default=0)
     public = models.BooleanField(default=False)
     storage_size = models.IntegerField(default=0)
+
+    def layout_as_dict(self):
+        data = {'width':self.metabotnik_width, 'height':self.metabotnik_height }    
+        data['images']  = []
+        for f in self.files.all():
+            random_colour = '%x' % random.randint(0,180)
+            tmp = {'x':f.x, 'y':f.y, 'width':f.new_width, 'height':f.new_height, 
+                   'filename':f.filename, 'fill_style': '#%s' % (random_colour*3)}
+            data['images'].append(tmp)
+        return data
 
     def calc_storage_size(self):
         'Returns the number of bytes of storage used by this project, sets the storage_size attribute'

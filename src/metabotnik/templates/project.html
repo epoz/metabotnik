@@ -3,10 +3,11 @@
 {% block maincontent %}
 <div style="padding: 30px">
 
+{% if project.metabotnik_path %}<a title="View this metabotnik, filling the browser window" href="{%url 'project' project.pk%}?kaal=1" class="button" style="float:right">V</a>{% endif %}
 <h3 title="Click to change the name" id="projectname">{{project.name|default:"(currently nameless project, click here to give it a name )"}}</h3>
 <input title="Press Enter to save the new name" type="text" id="projectname_edit" style="display: none" size="75" placeholder="{{project.name|default:'Enter a project name'}}">
 <div>Located in: Dropbox/Apps/Metabotnik{{project.path}}</div>
-<div>
+<div id="progress_indicator">
     <div class="progress"><span id="num_files_local">Has {{project.num_files_on_dropbox}} files on Dropbox, and {{project.num_files_local}} downloaded</span></div>
 </div>
 <div>Created on: {{project.created}}</div>
@@ -22,16 +23,18 @@
 </div>
 
 
-<div id="genbox" style="{% if project.status == 'generating' or project.num_files_local != project.num_files_on_dropbox %}display: none;{% endif %} padding: 20px 0; width: 100%; height: 520px">
+<div id="genbox" style="{% if project.status == 'generating' or project.files.count != project.num_files_on_dropbox %}display: none;{% endif %} padding: 20px 0; width: 100%; height: 520px">
    
 
     <div style="width: 400px; float:left; padding-left: 40px">
-         <input type="radio" name="layout" value="horizontal" checked="1"> horizontal layout<br>
-         <input type="radio" name="layout" value="vertical"> vertical layout<br>
-         <input type="radio" name="layout" value="random"> random layout<br>
+         <select id="layout">
+             <option value="horizontal"{% if project.layout_mode == 'horizontal'%} selected="1"{% endif %}>horizontal layout</option>
+             <option value="vertical"{% if project.layout_mode == 'vertical'%} selected="1"{% endif %}>vertical layout</option>
+             <option value="random" {% if project.layout_mode == 'random'%} selected="1"{% endif %}>random layout</option>
+         </select>
          <select id="background_color">
-            <option value="#fff">white background</option>
-            <option value="#000">black background</option>
+            <option value="#ffffff"{% if project.background_color == '#ffffff'%} selected="1"{% endif %}>white background</option>
+            <option value="#000000"{% if project.background_color == '#000000'%} selected="1"{% endif %}>black background</option>
          </select><br><br>
          <a class="button" id="makepreview" href="#">Preview</a>
          <div id="previewspinner"  style="display:none; width:100%; background-color: #fff; padding: 0 40px">making a preview...<img src="{{STATIC_URL}}/img/spinner.gif"></div>         
@@ -41,9 +44,8 @@
          <br><br><br>          
          <input type="checkbox" id="sendemail" checked="1"> Notify me via email when a task is completed
 
-        {% if project.status != 'generating' %}        
-        <a href="#" id="generate" class="conversionbutton" style="margin-top: 10px">Make the metabotnik</a>
-    {% endif %}
+        {% if project.status != 'generating' %}<a href="#" id="generate" class="conversionbutton" style="margin-top: 10px">Make the metabotnik</a>{% endif %}
+
     </div>
 
     <div style="left: 500px; position: absolute">
@@ -54,18 +56,6 @@
 </div>
 
 
-{% if project.preview_width > 0 and project.preview_height > 0 %}
-    {% if False and not user.is_anonymous %}    
-    <div style="padding: 30px 0 0 10px">
-            <a href="#" id="savesection" class="button">Download a Selection</a>
-            <div id="savedsections" style="display:none"></div>    
-    </div>
-    {% endif %}
-
-<div id="preview" class="openseadragon" style="height: 500px; margin-top: 10px"></div>
-{% endif %}
-
-
 {% endblock maincontent %}
 
 {% block extra_javascript_end %}
@@ -74,7 +64,7 @@ var c = canvas.getContext("2d");
 c.save();
 c.fillStyle = "#fff";
 c.fillRect(0,0,500,500);
-var img_data = [];
+var img_data = {{img_data|safe}};
 
 function drawImage(img) {
     c.fillStyle = img.fill_style;
@@ -106,7 +96,7 @@ function updateCanvas() {
     }
 
     $.post('{% url 'json_project' project.pk %}', 
-          {'layout': $('input:radio[name=layout]:checked').val(),
+          {'layout': $('#layout').val(),
            'frame': frame, 'csrfmiddlewaretoken': '{{csrf_token}}',
            'background_color': $('#background_color').val()
           }, 
@@ -124,9 +114,7 @@ $('#makepreview').click(function(event) {
     updateCanvas();    
 });
 
-
-
-var num_files_local = {{project.num_files_local}};
+var num_files_local = {{project.files.count}};
 var num_files_on_dropbox = {{project.num_files_on_dropbox}};
 $(".progress").each(function() {
     $(this).progressbar({
@@ -143,13 +131,19 @@ function getDownloadProgress() {
         if(num_files_local>0) {
             $('.progress').progressbar( "option", "value", num_files_local/num_files_on_dropbox*100 );
         }        
-        var tmp = 'Has {{project.num_files_on_dropbox}} files on Dropbox, and ' + num_files_local + ' downloaded';
+        var tmp = '<span style="font-size:60%"> Has {{project.num_files_on_dropbox}} files on Dropbox, and ' + num_files_local + ' downloaded.'
+        tmp = tmp + 'You can close this window and do other things while the files are downloading...</span>';
         setTimeout(getDownloadProgress, 2000);
-    } else {
+    } else {    
         var tmp = 'All {{project.num_files_on_dropbox}} files retrieved from Dropbox';
         $('.progress').progressbar( "option", "value", 100 );
         {% if project.status != 'generating' and project.status != 'dzgen' %} $('#genbox').show(); {% endif %}
-        
+        $.get('{% url 'json_project' project.pk %}', 
+        function(data) {
+            img_data = data;
+            drawCanvas();
+        });
+        $('#progress_indicator').hide();
     }
     $('#num_files_local').html(tmp);
 }
@@ -218,7 +212,7 @@ $('#projectname_edit').keyup(function(event) {
 });
 $('#generate').click(function(event) {
     event.preventDefault();
-    var layout = $('input:radio[name=layout]:checked').val();
+    var layout = $('#layout').val();
     var sendemail = $('#sendemail').val();        
     $.post('{% url 'generate' project.pk %}', 
         {'csrfmiddlewaretoken': '{{csrf_token}}', 

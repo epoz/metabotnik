@@ -64,6 +64,10 @@ def execute_task(task):
 
 # Defined tasks follow here ############################################################
 
+def layout(payload):
+    project = Project.objects.get(pk=payload['project_id'])
+    planodo.horzvert_layout(project)
+
 def makethumbnails(payload):
     project = Project.objects.get(pk=payload['project_id'])
 

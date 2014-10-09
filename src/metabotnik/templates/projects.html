@@ -10,7 +10,7 @@
 
 {% if projects %}
 {% for p in projects %} <p style="margin: 0">
-    <a href="{% url 'project' p.pk %}" title="{{p.storage_size|filesizeformat}}">{{p}}</a> 
+    <a href="{% url 'project' p.pk %}" title="{{p.storage_size|filesizeformat}} {{p.files.count}} files">{{p}}</a> 
     {% if user == p.user or user.is_superuser %}<a class="button buttonsmall" href="{% url 'edit_project' p.pk %}">edit</a>{% endif %}
     <span style="font-size: 75%"> {% if not p.public %}not public{% endif %}
     {% if p.status == 'generating' or p.status == 'dzgen' %}&middot; being generated{% endif %}</span>

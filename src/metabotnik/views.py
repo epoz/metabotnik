@@ -41,6 +41,10 @@ def new_project(request):
         'action': 'download_dropboxfiles',
         'project_id': project.pk
     })
+    new_task(request.user, {
+        'action': 'layout',
+        'project_id': project.pk
+    })
 
     url = reverse('edit_project', args=[project.pk])
     return redirect(url)
@@ -110,7 +114,7 @@ def savesection(request, project_id):
 
 def num_files_local(request, project_id):
     project = Project.objects.get(pk=project_id)
-    return HttpResponse(str(project.num_files_local))
+    return HttpResponse(str(project.files.count()))
 
 def project(request, project_id):
     project = Project.objects.get(pk=project_id)
@@ -137,33 +141,27 @@ def edit_project(request, project_id):
     else:
         return redirect(reverse('project', args=[project.pk]))
     project.calc_storage_size()
-    return render(request, templatename, {'project':project})
+    context = {
+        'project':project, 
+        'img_data':json.dumps(project.layout_as_dict())
+    }
+    return render(request, templatename, context)
 
-@require_POST
 def json_project(request, project_id):
     project = Project.objects.get(pk=project_id)
     if project.user != request.user and not request.user.is_superuser:
         return redirect(reverse('project', args=[project.pk]))
 
-    layout = request.POST.get('layout', 'horizontal')
-    frame = request.POST.get('frame', '0')
-    background_color = request.POST.get('background_color', '#fff')
-    
-    width, height = horzvert_layout(project, layout=layout, frame=frame)
-    project.layout_mode = layout
-    project.background_color = background_color
-    project.metabotnik_width = width
-    project.metabotnik_height = height
-    project.save()
+    if request.method == 'POST':
+        layout = request.POST.get('layout', 'horizontal')
+        frame = request.POST.get('frame', '0')
+        background_color = request.POST.get('background_color', '#fff')        
 
-    data = {'width':width, 'height':height }    
-    data['images']  = []
-    for f in project.files.all():
-        random_colour = '%x' % random.randint(0,180)
-        tmp = {'x':f.x, 'y':f.y, 'width':f.new_width, 'height':f.new_height, 
-               'filename':f.filename, 'fill_style': '#%s' % (random_colour*3)}
-        data['images'].append(tmp)
-    return HttpResponse(json.dumps(data), content_type='application/json')
+        project.layout_mode = layout
+        project.background_color = background_color
+        horzvert_layout(project, frame=frame)
+
+    return HttpResponse(json.dumps(project.layout_as_dict()), content_type='application/json')
 
 
 def metadata_project(request, project_id):

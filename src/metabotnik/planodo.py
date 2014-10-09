@@ -6,7 +6,7 @@ import warnings
 # Disable the warnings for giant images
 warnings.simplefilter('ignore', Image.DecompressionBombWarning)
 
-def horzvert_layout(project, layout='horizontal', frame=0):
+def horzvert_layout(project, frame=0):
     # Allow overrriding the row_height by having a paramater passed in
 
     files = list(project.files.all())
@@ -18,22 +18,22 @@ def horzvert_layout(project, layout='horizontal', frame=0):
     except ValueError:
         frame = 0    
     
-    if layout == 'horizontal':
+    if project.layout_mode == 'horizontal':
         stripe_height = min(f.height for f in files) + frame
-    if layout == 'vertical':
+    if project.layout_mode == 'vertical':
         stripe_width = min(f.width for f in files) + frame
 
     # Calculate a new width/height for the files
     # based on making them all the same height
     for f in files:
-        if layout == 'horizontal':
+        if project.layout_mode == 'horizontal':
             f.new_height = stripe_height
             if f.height != stripe_height:
                 ratio = float(f.width)/float(f.height)
                 f.new_width = int(stripe_height*ratio)
             else:
                 f.new_width = f.width
-        elif layout == 'vertical':
+        elif project.layout_mode == 'vertical':
             f.new_width = stripe_width
             if f.width != stripe_width:
                 ratio = float(f.width)/float(f.height)
@@ -51,10 +51,10 @@ def horzvert_layout(project, layout='horizontal', frame=0):
     average_width = sum(f.new_width for f in files) / len(files)
     average_height = sum(f.new_height for f in files) / len(files)
 
-    if layout == 'horizontal':
+    if project.layout_mode == 'horizontal':
         stripe_size = count_per_stripe * (average_width+frame*count_per_stripe)
         stripe_width = stripe_size
-    elif layout == 'vertical':
+    elif project.layout_mode == 'vertical':
         stripe_size = count_per_stripe * (average_height+frame*count_per_stripe)
         stripe_height = stripe_size        
     else:
@@ -73,7 +73,7 @@ def horzvert_layout(project, layout='horizontal', frame=0):
         if not thefile:
             thefile = files.pop(0) # just feels wrong to name it 'file'
             new_files.append(thefile)        
-        if layout == 'horizontal':
+        if project.layout_mode == 'horizontal':
             if (cur_size + thefile.new_width) < margin:
                 thefile.x = x
                 thefile.y = y
@@ -89,7 +89,7 @@ def horzvert_layout(project, layout='horizontal', frame=0):
                 x = 0
                 y += stripe_height
                 y += frame
-        elif layout == 'vertical':
+        elif project.layout_mode == 'vertical':
             if (cur_size + thefile.new_height) < margin:
                 thefile.x = x
                 thefile.y = y
@@ -114,15 +114,15 @@ def horzvert_layout(project, layout='horizontal', frame=0):
     if len(stripes) < (stripe_idx+1):
         stripes.append(cur_size)
     
-    if layout == 'horizontal':
-        # In horizontal layout, each stripe has an actual width that is less than the stripe_width
+    if project.layout_mode == 'horizontal':
+        # In horizontal project.layout_mode, each stripe has an actual width that is less than the stripe_width
         # To make the layout nicely centered, adjust each x with an offset.
         for f in new_files:
             offset = (stripe_width - stripes[f.stripe]) / 2
             f.x = f.x+offset
         canvas_width = stripe_width
         canvas_height = stripe_height * len(stripes)
-    elif layout == 'vertical':
+    elif project.layout_mode == 'vertical':
         for f in new_files:
             offset = (stripe_height - stripes[f.stripe]) / 2
             f.y = f.y+offset
@@ -136,7 +136,10 @@ def horzvert_layout(project, layout='horizontal', frame=0):
     for f in new_files:
         f.save()
 
-    return canvas_width, canvas_height
+    # Remember that in some calls that pass in project, the attributes (like layout_mode) might be modified already
+    project.metabotnik_width = canvas_width
+    project.metabotnik_height = canvas_height
+    project.save()
 
 def make_bitmap(project, filepath):
     'Given the layout coordinates for @project, generate a bitmap and save it under @filename'
