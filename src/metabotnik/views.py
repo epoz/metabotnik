@@ -176,11 +176,12 @@ def sorting_project(request, project_id):
     if request.method == 'POST':
         file_list = request.POST.get('file_list', u'').strip(' \n\r').split('\n')
         project.set_file_order(file_list)
+        horzvert_layout(project)
         return HttpResponse('OK')
 
     textarea_rows = min(project.files.count(), 20)
     return render(request, 'sorting.html', 
-                 {'project':project, 'textarea_rows':textarea_rows
+                 {'project':project, 'textarea_rows':textarea_rows, 'img_data':json.dumps(project.layout_as_dict())
                  }) 
 
 def projects(request):

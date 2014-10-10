@@ -2,6 +2,7 @@ import os
 import math, random
 from PIL import Image
 import warnings
+from django.db import connection
 
 # Disable the warnings for giant images
 warnings.simplefilter('ignore', Image.DecompressionBombWarning)
@@ -90,15 +91,18 @@ def horzvert_layout(project, frame=0):
                 y += stripe_height
                 y += frame
         elif project.layout_mode == 'vertical':
-            if (cur_size + thefile.new_height) < margin:
+            if ((cur_size + thefile.new_height) < margin):
                 thefile.x = x
                 thefile.y = y
                 thefile.stripe = stripe_idx            
                 y += thefile.new_height
                 cur_size += thefile.new_height
+                dontfit = True if thefile.is_break else False
                 thefile = None
-                y += frame
-            elif cur_size > 0:
+                y += frame                
+            else:
+                dontfit = True
+            if dontfit and (cur_size > 0):
                 stripes.append(cur_size)
                 stripe_idx += 1
                 cur_size = 0
@@ -134,7 +138,11 @@ def horzvert_layout(project, frame=0):
 
     # And save all the modified attributes
     for f in new_files:
-        f.save()
+#        f.save()  # Taking WAAAAAAY too long doing a regular save, so some raw SQL called for.
+        cursor = connection.cursor()
+        cursor.execute('UPDATE metabotnik_file SET x = %s, y = %s, new_width = %s, new_height = %s WHERE id = %s',
+                       (f.x, f.y, f.new_width, f.new_height, f.pk))
+
 
     # Remember that in some calls that pass in project, the attributes (like layout_mode) might be modified already
     project.metabotnik_width = canvas_width
