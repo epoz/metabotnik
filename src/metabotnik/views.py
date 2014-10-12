@@ -117,7 +117,10 @@ def num_files_local(request, project_id):
     return HttpResponse(str(project.files.count()))
 
 def project(request, project_id):
-    project = Project.objects.get(pk=project_id)
+    try:
+        project = Project.objects.get(pk=project_id)
+    except Project.DoesNotExist:
+        return HttpResponseNotFound()
     if not project.public and not project.user == request.user and not request.user.is_superuser:
         return HttpResponseNotFound()
     if request.GET.get('kaal'):
