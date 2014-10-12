@@ -78,7 +78,10 @@ def makethumbnails(payload):
 
     # this command does not run in a shell, so we need to supply the wildcard arguments
     input_files = [os.path.join(project.originals_path, x) for x in os.listdir(project.originals_path) if x.lower().endswith('.jpg')]
-    subprocess.call(['%svipsthumbnail'%settings.VIPSBIN_PATH, '-o', output_filepath]+input_files)
+    # Due to a file limit bug in vipsthumbnail, do 300 at a time : https://github.com/jcupitt/libvips/issues/182
+    while input_files:
+        subprocess.call(['%svipsthumbnail'%settings.VIPSBIN_PATH, '-o', output_filepath]+input_files[:300])
+        input_files = input_files[300:]
 
 
 def makedeepzoom(payload):
