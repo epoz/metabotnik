@@ -1,6 +1,7 @@
 from django.conf.urls import patterns, include, url
 
 from django.contrib import admin
+admin.site.index_template = 'custom_admin_index.html'
 admin.autodiscover()
 
 urlpatterns = patterns('',    
