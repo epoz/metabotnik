@@ -2,6 +2,8 @@
 
 {% block maincontent %}
 <div style="padding: 10px; ">
+    {% if project.metabotnik_path %}<a title="View this metabotnik, filling the browser window" href="{%url 'project' project.pk%}?kaal=1" class="button" style="float:right">V</a>{% endif %}
+
 <h3>{{project.name|default:"(currently nameless project)"}}</h3>
 {% if project.user == user %}
 <a class="button buttonsmall" href="{% url 'edit_project' project.pk %}">edit</a>
