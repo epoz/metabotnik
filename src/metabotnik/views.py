@@ -41,10 +41,6 @@ def new_project(request):
         'action': 'download_dropboxfiles',
         'project_id': project.pk
     })
-    new_task(request.user, {
-        'action': 'layout',
-        'project_id': project.pk
-    })
 
     url = reverse('edit_project', args=[project.pk])
     return redirect(url)
