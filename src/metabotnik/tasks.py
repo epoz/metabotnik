@@ -199,3 +199,13 @@ def extract_metadata(payload):
         # check the image size        
         image.width, image.height = Image.open(filepath).size
         image.save()
+
+def makemetametabotnik(payload):
+    'For all the public Projects with a metabotnik, make a thumbnail of them and combine into one giant metabotnik'
+    metaproject = Project.objects.get(name='Metametabotnik')
+    for p in Project.objects.filter(public=True):
+        path = p.metabotnik_path()
+        if not path: continue
+        subprocess.call(['%svipsthumbnail'%settings.VIPSBIN_PATH, '-o', 'preview.jpg', '-s', '1000', path])
+        os.link(path, os.path.join(metaproject.originals_path(), 'project_%s.jpg' % p.pk))
+    extract_metadata({'project_id':metaproject.pk})
