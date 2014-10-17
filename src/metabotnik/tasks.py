@@ -207,5 +207,6 @@ def makemetametabotnik(payload):
         path = p.metabotnik_path()
         if not path: continue
         subprocess.call(['%svipsthumbnail'%settings.VIPSBIN_PATH, '-o', 'preview.jpg', '-s', '1000', path])
-        os.link(path, os.path.join(metaproject.originals_path, 'project_%s.jpg' % p.pk))
+        preview_path = os.path.join(p.storage_path, 'preview.jpg')
+        os.link(preview_path, os.path.join(metaproject.originals_path, 'project_%s.jpg' % p.pk))
     extract_metadata({'project_id':metaproject.pk})
