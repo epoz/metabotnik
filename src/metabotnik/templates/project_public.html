@@ -8,6 +8,11 @@
 {% if project.user == user %}
 <a class="button buttonsmall" href="{% url 'edit_project' project.pk %}">edit</a>
 {% endif %}
+
+{% if project.description %}
+<div>{{project.description}}</div>
+{% endif %}
+
 </div>
 
 {% if project.metabotnik_path %}
