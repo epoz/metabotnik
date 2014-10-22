@@ -20,7 +20,7 @@ project_status_choices = (
     ('preview', 'Has a Preview'),
     ('generating', 'Busy Generating'),
     ('dzgen', 'Busy Making DeepZoom'),
-    ('done', 'Done'),
+    ('done', 'Done with making your Metabotnik'),
     ('deleted', 'Deleted'),
 )
 project_layout_choices = (

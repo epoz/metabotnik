@@ -3,7 +3,10 @@
 {% block maincontent %}
 <div style="padding: 30px">
 
-<h3><a title="Edit project" href="{% url 'edit_project' project.pk %}">{{project.name|default:"(currently nameless project)"}}</a></h3>
+{% if project.metabotnik_path %}<a title="View this metabotnik, filling the browser window" href="{%url 'project' project.pk%}?kaal=1" class="button" style="float:right">V</a>{% endif %}
+<a href="{% url 'edit_project' project.pk %}" title="Edit the layout this project" class="button" style="float:right; margin-right: 10px">Layout</a>
+
+<h3>{{project.name|default:"(currently nameless project)"}}</h3>
 <div>Located in: Dropbox/Apps/Metabotnik{{project.path}}</div>
 
 <div style="float:right">
@@ -20,8 +23,9 @@
 
 <div id="help1text" style="width: 450px; display: none; position: absolute; top: 90px; padding: 20px; background-color: #fff; border: 2px solid #aaa;">
 <p>In a new project, files are sorted alphabetically by filename.</p>
-<p>Using the textbox on the left you can change the ordering of the files in your project, without renaming all the files in your Dropbox. Cut and paste the filenames in the desired order.</p>
+<p>Using the textbox you can change the ordering of the files in your project, without renaming all the files in your Dropbox. Cut and paste the filenames in the desired order.</p>
 <p>Adding a blank line will start a new row in a horizontal layout, or start a new column in vertical layout</p>
+<p>Click on an image in the preview to see which filename it has.</p>
 
 <a href="#" class="close button buttonsmall">close</a>
 </div>

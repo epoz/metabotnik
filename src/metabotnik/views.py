@@ -126,7 +126,7 @@ def edit_project(request, project_id):
     project = Project.objects.get(pk=project_id)
     templatename = 'project.html'
     if project.user == request.user or request.user.is_superuser:        
-        if request.method == 'POST':
+        if request.method == 'POST':            
             newname = request.POST.get('name')
             if newname:
                 project.name = newname
@@ -135,6 +135,11 @@ def edit_project(request, project_id):
                 project.public = True
             if public == '0':
                 project.public = False
+            description = request.POST.get('description')
+            if description:
+                project.description = description
+                if description == '__clear__':
+                    project.description = ''
             project.save()
     else:
         return redirect(reverse('project', args=[project.pk]))
