@@ -46,20 +46,7 @@
         maxZoomPixelRatio: 100,
         prefixUrl:     '{{STATIC_URL}}openseadragon/images/',
         showNavigator:  false,
-        {% if project.deepzoom %}
-        tileSources: "/s/project_{{project.pk}}/deepzoom.dzi"
-        {% else %}
-        tileSources: [
-            {
-                type: 'legacy-image-pyramid',
-                levels: [{"url": "{{csrf_token}}/preview.jpg", 
-                          "width": {{project.preview_width}},         
-                          "height": {{project.preview_height}}
-                         }
-                ]
-            }
-        ]
-        {% endif %}
+        tileSources: "/s/project_{{project.pk}}/{{project.metabotnik_nonce}}.dzi"
     });
     $(window).resize(function() {
         $('#preview').height( window.innerHeight );

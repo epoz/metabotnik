@@ -11,6 +11,8 @@ from django.conf import settings
 import planodo
 from PIL import Image
 from metabotnik.xmp import read_metadata
+import random
+import shutil
 
 class RetryTaskException(Exception):
     'Raise this Exception in a task to have it retried later'
@@ -88,17 +90,23 @@ def makedeepzoom(payload):
     project = Project.objects.get(pk=payload['project_id'])    
     project.set_status('dzgen')
 
+    new_nonce = ''.join(random.choice('0123456789abcdef') for i in range(6))    
     # Call VIPS to make the DZ
     input_filepath = os.path.join(project.storage_path, 'metabotnik.jpg')
-    output_filepath = os.path.join(project.storage_path, 'deepzoom')
-
-    # At some point change this: first make the new pyramid files in a temp directory
-    # then remove the old one and renema the temp one to the regular location
-
-    # rm the deepzoom folder
-    subprocess.call(['rm', '-rf', os.path.join(project.storage_path, 'deepzoom_files')])
+    output_filepath = os.path.join(project.storage_path, new_nonce)
     subprocess.call(['%svips'%settings.VIPSBIN_PATH, 'dzsave', input_filepath, output_filepath, '--suffix', '.jpg'])
 
+    try:
+        # clean up the previous deepzoom folder and dzi file
+        old_path = os.path.join(project.storage_path, project.metabotnik_nonce+'_files')
+        shutil.rmtree(old_path, ignore_errors=True)
+        os.remove(os.path.join(project.storage_path, project.metabotnik_nonce+'.dzi'))
+    except OSError:
+        # maybe the files were removed by some other process, just move right along
+        pass
+        # though really, we need to do some better logging and signalling
+
+    project.metabotnik_nonce = new_nonce
     project.set_status('done')
 
 

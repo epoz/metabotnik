@@ -3,7 +3,6 @@ from django.dispatch.dispatcher import receiver
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.template.defaultfilters import filesizeformat
-from datetime import datetime
 import json
 import os
 import shutil
@@ -44,6 +43,7 @@ class Project(models.Model):
     background_color = models.CharField(max_length=7, default='#ffffff')
     preview_width = models.IntegerField(default=0)
     preview_height = models.IntegerField(default=0)
+    metabotnik_nonce = models.CharField(max_length=100, null=True, blank=True)
     metabotnik_width = models.IntegerField(default=0)
     metabotnik_height = models.IntegerField(default=0)
     public = models.BooleanField(default=False)

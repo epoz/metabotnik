@@ -12,7 +12,6 @@ import os
 import mimetypes
 import subprocess
 import json
-import random
 
 def s(request, path):
     if not settings.DEBUG:

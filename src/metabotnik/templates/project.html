@@ -244,7 +244,7 @@ $('#public').click(function(event) {
         prefixUrl:     '{{STATIC_URL}}openseadragon/images/',
         showNavigator:  false,
         {% if project.deepzoom %}
-        tileSources: "/s/project_{{project.pk}}/deepzoom.dzi"
+        tileSources: "/s/project_{{project.pk}}/{{project.metabotnik_nonce}}.dzi"
         {% else %}
         tileSources: [
             {
