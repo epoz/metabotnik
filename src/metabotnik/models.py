@@ -172,6 +172,7 @@ task_status_choices = (
     ('done', 'Done'),
 )
 class Task(models.Model):
+    project = models.ForeignKey(Project, related_name='tasks', null=True, blank=True)
     action = models.CharField(max_length=200)
     user = models.ForeignKey(User, related_name='tasks')
     created = models.DateTimeField(auto_now_add=True)
@@ -199,8 +200,12 @@ class Task(models.Model):
         return u'%s %s' % (self.action, self.user.email)
 
     def duration(self):
-        # This should be a timedelta of the self.time_ended - self.time_started
-        return self.created
+        # This is a timedelta of the self.time_ended - self.time_started
+        # for simplicity only do the seconds
+        if not self.time_ended:
+            return None
+        tmp = self.time_ended.replace(microsecond=0) - self.time_started.replace(microsecond=0)
+        return tmp
 
     @property
     def user_full_name(self):

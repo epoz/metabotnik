@@ -34,7 +34,7 @@ class FileAdmin(admin.ModelAdmin):
 admin.site.register(File, FileAdmin)
 
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ('action', 'status', 'user_full_name', 'created', 'time_ended')
+    list_display = ('project', 'action', 'status', 'user_full_name', 'created', 'time_ended', 'duration')
     list_filter = ('action', 'status',)
     date_hierarchy = 'created'
 admin.site.register(Task, TaskAdmin)
