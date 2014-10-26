@@ -165,9 +165,11 @@ def download_dropboxfiles(payload):
     
 
     
-    # Get the metadata as we are downloading the files,
-    # but it can be run as a separate task too.
-    extract_metadata(payload)
+    # Get the metadata as a separate task
+    new_task(project.user, {
+        'action': 'extract_metadata',
+        'project_id': project.pk
+    })
 
     # schedule a thumbnail task
     new_task(project.user, {
