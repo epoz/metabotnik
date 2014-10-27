@@ -101,7 +101,7 @@ def makedeepzoom(payload):
         old_path = os.path.join(project.storage_path, project.metabotnik_nonce+'_files')
         shutil.rmtree(old_path, ignore_errors=True)
         os.remove(os.path.join(project.storage_path, project.metabotnik_nonce+'.dzi'))
-    except OSError:
+    except (OSError, TypeError):
         # maybe the files were removed by some other process, just move right along
         pass
         # though really, we need to do some better logging and signalling
