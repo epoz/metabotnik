@@ -202,8 +202,11 @@ def extract_metadata(payload):
                     File(project=project, filename=filename, order=order)
         )
         order += 1
-        tmp = read_metadata(filepath)
-        image.metadata = json.dumps(tmp)
+        try:
+            tmp = read_metadata(filepath)
+            image.metadata = json.dumps(tmp)
+        except:
+            pass        
         # check the filesize
         image.size = os.stat(filepath).st_size
         # check the image size        
