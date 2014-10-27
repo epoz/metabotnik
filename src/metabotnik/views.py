@@ -108,7 +108,10 @@ def savesection(request, project_id):
     return HttpResponse('/s/project_%s/%s' % (project.pk, section_filename))
 
 def num_files_local(request, project_id):
-    project = Project.objects.get(pk=project_id)
+    try:
+        project = Project.objects.get(pk=project_id)
+    except Project.DoesNotExist:
+        return HttpResponseNotFound()
     return HttpResponse(str(project.files.count()))
 
 def project(request, project_id):
