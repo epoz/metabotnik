@@ -15,7 +15,7 @@
 
 <h2 style="margin: 0">Metadata of {{project.files.count}} images <a href="#" id="help1" class="button buttonsmall" title="help">?</a></h2>
 
-<textarea rows="{{textarea_rows}}" style="float:left; margin-right: 20px; width: 350px" id="file_list">
+<textarea rows="{{textarea_rows}}" style="float:left; margin-right: 20px; width: 450px" id="file_list">
 {% for f in project.files.all %}{{f.metadata_as_textbase}}
 $
 {% endfor %}
