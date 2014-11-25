@@ -171,7 +171,22 @@ def json_project(request, project_id):
 
 
 def metadata_project(request, project_id):
-    return sorting_project(request, project_id)
+    project = Project.objects.get(pk=project_id)
+    if project.user != request.user and not request.user.is_superuser:
+        return redirect(reverse('project', args=[project.pk]))
+
+    # Use a POST to this method to save the sortorder of the files
+    if request.method == 'POST':
+        file_list = request.POST.get('file_list', u'').strip(' \n\r')
+        project.set_metadata(file_list)
+        horzvert_layout(project)
+        return HttpResponse('OK')
+
+    textarea_rows = min(project.files.count(), 20)
+    return render(request, 'metadata.html', 
+                 {'project':project, 'textarea_rows':textarea_rows, 'img_data':json.dumps(project.layout_as_dict())
+                 }) 
+
 
 def sorting_project(request, project_id):
     project = Project.objects.get(pk=project_id)

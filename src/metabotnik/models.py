@@ -7,6 +7,7 @@ import json
 import os
 import shutil
 import random
+import textbase
 
 class DropBoxInfo(models.Model):
     user = models.OneToOneField(User, primary_key=True)
@@ -55,7 +56,7 @@ class Project(models.Model):
         for f in self.files.all():
             random_colour = '%x' % random.randint(0,180)
             tmp = {'x':f.x, 'y':f.y, 'width':f.new_width, 'height':f.new_height, 
-                   'filename':f.filename, 'fill_style': '#%s' % (random_colour*3)}
+                   'pk':f.pk, 'filename':f.filename, 'fill_style': '#%s' % (random_colour*3)}
             data['images'].append(tmp)
         return data
 
@@ -107,6 +108,19 @@ class Project(models.Model):
         for f in current_files.values():
             f.save()
 
+
+    def set_metadata(self, textbase_buffer):
+        data = {}
+        for tmp in textbase.TextBase(str(textbase_buffer)):
+            data[tmp.get('FILENAME', [None])[0]] = tmp
+        for f in self.files.all():
+            metadata = data.get(f.filename)
+            if metadata:
+                for k,v in metadata.copy().items():
+                    if not filter(None, v):
+                        del metadata[k]
+                f.metadata = json.dumps(metadata)
+                f.save()
 
     def set_status(self, status):
         self.status = status
@@ -164,6 +178,25 @@ class File(models.Model):
 
     def pretty_size(self):
         return filesizeformat(self.size)
+
+    def metadata_as_textbase(self):
+        if not self.metadata:
+            return ''
+        metadata = json.loads(self.metadata)
+        metadata['FILENAME'] = [self.filename]
+        if 'filepath' in metadata:
+            del metadata['filepath']
+        if 'DESCRIPTION' in metadata:
+            del metadata['DESCRIPTION']
+
+        buf = []
+        for k,v in metadata.items():
+            if type(v) is not list:
+                vv = [v]
+            else:
+                vv = v
+            buf.append(k+' '+u'\n; '.join(vv))
+        return u'\n'.join(buf)
 
 task_status_choices = (
     ('new', 'New'),

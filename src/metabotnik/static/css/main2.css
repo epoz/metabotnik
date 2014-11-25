@@ -175,6 +175,14 @@ body {
 .faqs h3 {display: block; margin-bottom: 0}
 .faqs p {margin: 0; padding-left: 30px; color: #aaa; width: 50%}
 
+.openseadragon-overlay {
+    opacity:    0.2;
+    filter:     alpha(opacity=20);
+    border:     2px solid #0A7EbE;
+    outline:    10px auto #0A7EbE;
+    background-color: white;
+}
+
 /* ==========================================================================
    Helper classes
    ========================================================================== */

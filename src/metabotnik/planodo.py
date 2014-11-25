@@ -7,6 +7,54 @@ from django.db import connection
 # Disable the warnings for giant images
 warnings.simplefilter('ignore', Image.DecompressionBombWarning)
 
+class Last:
+    pass
+
+def phorzvert_layout(project, frame=None):
+    # sort the images by size, largest first where size is the area    
+    files = sorted(project.files.all(), key=lambda x: x.width * x.height, reverse=True)
+    last_file = Last()
+    last_file.x, last_file.y = 0, 0
+    last_file.width, last_file.height = 0,0
+    order = ['t', 'r', 'b', 'l']  # top, right, bottom, left
+    canvas_width, canvas_height = 0, 0
+    new_files = []
+    while files:
+        file = files.pop()
+        if not order:
+            order = ['t', 'r', 'b', 'l']
+
+        new_order = order.pop(0)
+        if new_order == 't':
+            file.x = last_file.x
+            file.y = last_file.y - file.height
+            last_file.y -= file.height
+        elif new_order == 'r':
+            file.x = last_file.x + last_file.width
+            file.y = last_file.y            
+        elif new_order == 'b':
+            file.x = last_file.x
+            file.y = last_file.y + last_file.height
+        elif new_order == 'l':
+            file.x = last_file.x - file.width
+            file.y = last_file.y
+            last_file.x -= file.width
+        if new_order in ('t', 'b'):
+            last_file.height += file.height
+        if new_order in ('r', 'l'):
+            last_file.width += file.width
+        new_files.append(file)
+
+    # And save all the modified attributes
+    for f in new_files:
+        f.new_width, f.new_height = f.width, f.height
+        cursor = connection.cursor()
+        cursor.execute('UPDATE metabotnik_file SET x = %s, y = %s, new_width = %s, new_height = %s WHERE id = %s',
+                       (f.x, f.y, f.new_width, f.new_height, f.pk))
+    project.metabotnik_width = last_file.width
+    project.metabotnik_height = last_file.height
+    project.save()
+
 def horzvert_layout(project, frame=0):
     # Allow overrriding the row_height by having a paramater passed in
 

@@ -1,6 +1,18 @@
 {% extends "base.html" %}
+{% load utilz %}
+
+{% block extra_style %}
+#thetip {display:none; width:350px; background-color:#fff; padding: 10px; -webkit-border-radius: 10; -moz-border-radius: 10; border-radius: 10;  z-index: 99999;}
+.needhighlight {
+    opacity: 0.2; filter: alpha(opacity=20); border: 2px solid #0A7EbE; outline: 10px auto #0A7EbE; background-color: white;
+}
+{% endblock %}
 
 {% block maincontent %}
+<div id="thetip">
+    <p>Some text to go here...</p>
+</div>
+
 <div style="padding: 10px; ">
     {% if project.metabotnik_path %}<a title="View this metabotnik, filling the browser window" href="{%url 'project' project.pk%}?kaal=1" class="button" style="float:right">V</a>{% endif %}
 
@@ -35,13 +47,14 @@
 
 {% block extra_javascript_end %}
 {% if project.metabotnik_path %}
-    var viewer1 = OpenSeadragon({
-        id:            "preview",
-        maxZoomPixelRatio: 100,
-        prefixUrl:     '{{STATIC_URL}}openseadragon/images/',
-        showNavigator:  false,
-        tileSources: "/s/project_{{project.pk}}/{{project.metabotnik_nonce}}.dzi"
-    });
+var viewer1 = OpenSeadragon({
+    id:            "preview",
+    maxZoomPixelRatio: 100,
+    prefixUrl:     '{{STATIC_URL}}openseadragon/images/',
+    showNavigator:  false,
+    tileSources: "/s/project_{{project.pk}}/{{project.metabotnik_nonce}}.dzi",
+    overlays: [{% json_to_overlay project.layout_as_dict %}]
+});
 
 $('#savesection').click(function(event) {
     event.preventDefault();
@@ -60,6 +73,42 @@ $('#savesection').click(function(event) {
             }
     );
 });
+
+overlay_data = { {% for f in project.files.all %}{% if f.metadata %}overlay{{f.pk}}:{{f.metadata|safe}}{% if not forloop.last %},{% endif %}
+{% endif %}    
+{% endfor %}};
+
+setTimeout(function() {
+    var tip = $('#thetip');
+    $(".needhighlight").hover(function(e) { 
+        tip.html('<a href="' + overlay_data[$(this)[0].id].LINK + '">!!</a>');
+        
+        var mousex = e.pageX + 20, //Get X coodrinates
+            mousey = e.pageY + 20, //Get Y coordinates
+            tipWidth = tip.width(), //Find width of tooltip
+            tipHeight = tip.height(), //Find height of tooltip
+        
+        //Distance of element from the right edge of viewport
+            tipVisX = $(window).width() - (mousex + tipWidth),
+        //Distance of element from the bottom of viewport
+            tipVisY = $(window).height() - (mousey + tipHeight);
+          
+        if ( tipVisX < 20 ) { //If tooltip exceeds the X coordinate of viewport
+            mousex = e.pageX - tipWidth - 20;
+        } if ( tipVisY < 20 ) { //If tooltip exceeds the Y coordinate of viewport
+            mousey = e.pageY - tipHeight - 20;
+        } 
+        tip.css({  top: mousey, left: mousex, position: 'absolute' });
+        tip.show().css({opacity: 0.8}); //Show tooltip
+    }, function() {
+        HIDETOOLTIP = setTimeout(function() {
+            tip.hide(); //Hide tooltip
+        }, 1500);
+        
+    });
+}, 1000);
+
+
 {% endif %}
 
 {% endblock extra_javascript_end %}

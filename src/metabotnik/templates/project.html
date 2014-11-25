@@ -6,6 +6,7 @@
 
 {% if project.metabotnik_path %}<a title="View this metabotnik, filling the browser window" href="{%url 'project' project.pk%}?kaal=1" class="button" style="float:right">V</a>{% endif %}
 <a id="description_button" href="#" title="Give the project a more extensive description" class="button" style="float:right; margin-right: 10px">Description</a>
+<a href="metadata" class="button" style="float:right; margin-right: 10px">Metadata</a>
 <a href="sorting" class="button" style="float:right; margin-right: 10px">Sorting</a>
 
 <h3 title="Click to change the name" id="projectname">{{project.name|default:"(currently nameless project, click here to give it a name )"}}</h3>
