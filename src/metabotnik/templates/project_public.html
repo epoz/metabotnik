@@ -81,7 +81,8 @@ overlay_data = { {% for f in project.files.all %}{% if f.metadata %}overlay{{f.p
 setTimeout(function() {
     var tip = $('#thetip');
     $(".needhighlight").hover(function(e) { 
-        tip.html('<a href="' + overlay_data[$(this)[0].id].LINK + '">!!</a>');
+        var the_link = overlay_data[$(this)[0].id].LINK;
+        tip.html('<a href="' + the_link + '">' + the_link + '</a>');
         
         var mousex = e.pageX + 20, //Get X coodrinates
             mousey = e.pageY + 20, //Get Y coordinates
