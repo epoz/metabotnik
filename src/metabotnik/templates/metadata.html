@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block maincontent %}
+<div style="padding: 30px">
+
+{% if project.metabotnik_path %}<a title="View this metabotnik, filling the browser window" href="{%url 'project' project.pk%}?kaal=1" class="button" style="float:right">V</a>{% endif %}
+<a href="{% url 'edit_project' project.pk %}" title="Edit the layout this project" class="button" style="float:right; margin-right: 10px">Layout</a>
+
+<h3>{{project.name|default:"(currently nameless project)"}}</h3>
+<div>Located in: Dropbox/Apps/Metabotnik{{project.path}}</div>
+
+<div style="float:right">
+  <canvas id="preview" width="500" height="500"></canvas>
+</div>
+
+<h2 style="margin: 0">Metadata of {{project.files.count}} images <a href="#" id="help1" class="button buttonsmall" title="help">?</a></h2>
+
+<textarea rows="{{textarea_rows}}" style="float:left; margin-right: 20px; width: 350px" id="file_list">
+{% for f in project.files.all %}{{f.metadata_as_textbase}}
+$
+{% endfor %}
+</textarea>
+
+<div id="help1text" style="width: 450px; display: none; position: absolute; top: 90px; padding: 20px; background-color: #fff; border: 2px solid #aaa;">
+<h2>Add & Edit metadata per file</h2>
+<p>Any fields and values can be used here, but some have some special meaning.</p>
+<p>Using a field call LINK will add the contents of this field as a hyperlink to the metabotnik. Each image with a LINK field then gets a small rectangle in the upper left corner which displays the LINK and lets the user click on the link to navigate there.</p>
+<a href="#" class="close button buttonsmall">close</a>
+</div>
+
+<div style="clear:both; padding-top: 20px">
+<a href="#" class="button" id="save_metadata">Save Metadata</a>
+</div>
+
+</div>
+
+<div style="left: 500px; position: absolute" tooltip="click an image to see the filename">
+    <p></p>
+    <canvas id="preview" width="500" height="500"></canvas>
+</div>
+
+
+
+{% endblock maincontent %}
+
+{% block extra_javascript_end %}
+
+$('#help1text').click(function(event) {
+  event.preventDefault();
+  $('#help1text').hide();
+});
+
+$('#help1').click(function(event) {
+  event.preventDefault();
+  $('#help1text').show();
+});
+
+$('#save_metadata').click(function(event) {
+    event.preventDefault();
+    var file_list = $('#file_list').val();
+    if(!file_list) {
+        alert('foo');
+        return;
+    }
+    $.post('{% url 'metadata_project' project.pk%}', 
+           {'csrfmiddlewaretoken': '{{csrf_token}}',
+            'file_list': file_list
+           },
+           function(data) {
+                document.location = '{% url 'metadata_project' project.pk %}';
+           }
+    );
+});
+
+var canvas = document.getElementById("preview");
+var c = canvas.getContext("2d");
+c.save();
+c.fillStyle = "#fff";
+c.fillRect(0,0,500,500);
+var img_data = {{img_data|safe}};
+
+function drawImage(img) {
+    c.fillStyle = img.fill_style;
+    c.fillRect(img.x,img.y,img.width,img.height);
+    var img_element = document.createElement("img");
+    img_element.src = "/s/project_{{project.pk}}/thumbnails/" + img.filename;
+    $(img_element).load(function() { 
+        c.drawImage(img_element,img.x,img.y,img.width,img.height);
+    });    
+}
+function drawCanvas() {
+    c.restore();
+    c.save();
+    c.fillStyle = '{{project.background_color}}';
+    c.fillRect(0,0,canvas.width,canvas.height);
+
+    var scale_x = canvas.width / img_data.width;
+    var scale_y = canvas.height / img_data.height;
+    c.scale(scale_x, scale_y);
+
+    for (var i = 0; i < img_data.images.length; i++) {
+        drawImage(img_data.images[i]);
+    }
+}
+function updateCanvas() {
+    $.get('{% url 'json_project' project.pk %}', 
+    function(data) {
+        img_data = data;
+        drawCanvas();
+    });
+}
+drawCanvas();
+
+function findImageMatch(canvasX, canvasY) {
+    var scaleX = canvas.width / img_data.width;
+    var scaleY = canvas.height / img_data.height;
+    var imgX = Math.round(canvasX/scaleX);
+    var imgY = Math.round(canvasY/scaleY);
+    var found = false;
+    
+    for(var i = img_data.images.length-1; i > -1; i--) {
+        var matchX = false;
+        var matchY = false;
+        var img = img_data.images[i];
+        var x2 = img.x + img.width;
+        var y2 = img.y + img.height;
+        if((imgX > img.x) && (imgX < x2)) matchX = true;
+        if((imgY > img.y) && (imgY < y2)) matchY = true;
+        if(matchX && matchY) {
+            found = img;
+            return found.filename;
+        }
+    }
+}
+$('#preview').click(function(event) {
+    var canvasX = event.pageX - this.offsetLeft;
+    var canvasY = event.pageY - this.offsetTop;    
+    var filename = findImageMatch(canvasX, canvasY);
+    if(filename) {
+        var start_selection = $('#file_list')[0].value.search(filename);
+        if(start_selection > -1) {
+            // Set the selection
+            $('#file_list')[0].selectionStart = start_selection + filename.length + 1;
+            $('#file_list')[0].selectionEnd = start_selection + filename.length + 1;
+            // And now try and scroll there
+            var lines = $('#file_list')[0].value.split('\n');
+            for(var i = 0; i < lines.length; i++) {
+                if(lines[i].search(filename) > -1) {
+                    var lineHeight = parseInt($('#file_list').css('line-height'));
+                    $('#file_list').scrollTop(i * lineHeight);
+                }
+            }
+            $('#file_list').focus();
+        }
+    }
+});
+
+{% endblock extra_javascript_end %}
