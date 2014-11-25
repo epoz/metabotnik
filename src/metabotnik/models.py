@@ -57,6 +57,8 @@ class Project(models.Model):
             random_colour = '%x' % random.randint(0,180)
             tmp = {'x':f.x, 'y':f.y, 'width':f.new_width, 'height':f.new_height, 
                    'pk':f.pk, 'filename':f.filename, 'fill_style': '#%s' % (random_colour*3)}
+            if f.metadata:
+                tmp['metadata'] = json.loads(f.metadata)
             data['images'].append(tmp)
         return data
 
