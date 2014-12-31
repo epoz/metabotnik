@@ -129,9 +129,12 @@ def horzvert_layout(project, frame=0):
                 thefile.stripe = stripe_idx            
                 x += thefile.new_width
                 cur_size += thefile.new_width
+                dontfit = True if thefile.is_break else False
                 thefile = None
                 x += frame
-            elif cur_size > 0:
+            else:
+                dontfit = True
+            if dontfit and (cur_size > 0):
                 stripes.append(cur_size)
                 stripe_idx += 1
                 cur_size = 0
