@@ -57,9 +57,7 @@ def phorzvert_layout(project, frame=None):
 
 def horzvert_layout(project, frame=0):
     # Allow overrriding the row_height by having a paramater passed in
-
     files = list(project.files.all())
-    count_per_stripe = int(round(math.sqrt(len(files))))
 
     # If a frame was passed in, adjust the x,y of all items to give them that much spacing as a frame
     try:
@@ -117,7 +115,10 @@ def horzvert_layout(project, frame=0):
     x,y = 0,0
     thefile = None
     cur_size = 0
-    margin = stripe_size*0.965
+    if len(files) == 1:
+        margin = stripe_size+1
+    else:
+        margin = stripe_size*0.965
     while files or thefile:
         if not thefile:
             thefile = files.pop(0) # just feels wrong to name it 'file'
