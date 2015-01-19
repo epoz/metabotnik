@@ -75,7 +75,9 @@ class Project(models.Model):
         return total
 
     def show(self):
-        return self.name if self.name else self.path
+        if self.name:
+            return self.name
+        return self.path[1:]
 
     def __unicode__(self):
         return self.show()
