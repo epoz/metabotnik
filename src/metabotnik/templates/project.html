@@ -51,12 +51,12 @@
          <select id="background_color">
             <option value="#ffffff"{% if project.background_color == '#ffffff'%} selected="1"{% endif %}>white background</option>
             <option value="#000000"{% if project.background_color == '#000000'%} selected="1"{% endif %}>black background</option>
-         </select><br><br>
+         </select>
+         <br>
+         Border: <input id="frame" type="text" size="4" value="0">
+         <br><br>
          <a class="button" id="makepreview" href="#">Preview</a>
          <div id="previewspinner"  style="display:none; width:100%; background-color: #fff; padding: 0 40px">making a preview...<img src="{{STATIC_URL}}/img/spinner.gif"></div>         
-         {% comment %}
-         &nbsp;&nbsp;&nbsp;frame: <input id="frame" type="text" size="4" value="0">   
-         {% endcomment %}
          <br><br><br>          
          <input type="checkbox" id="sendemail" checked="1"> Notify me via email when done
 
@@ -130,7 +130,7 @@ $('#makepreview').click(function(event) {
     updateCanvas();    
 });
 
-var num_files_local = {{project.files.count}};
+var num_files_local = {{project.num_files_local}};
 var num_files_on_dropbox = {{project.num_files_on_dropbox}};
 $(".progress").each(function() {
     $(this).progressbar({

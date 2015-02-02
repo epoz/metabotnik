@@ -59,16 +59,23 @@ def horzvert_layout(project, frame=0):
     # Allow overrriding the row_height by having a paramater passed in
     files = list(project.files.all())
 
+    if project.layout_mode == 'horizontal':
+        stripe_height = min(f.height for f in files)
+        if frame == 'slide':
+            frame = stripe_height / 2
+            stripe_height += frame*2
+    if project.layout_mode == 'vertical':
+        stripe_width = min(f.width for f in files)
+        if frame == 'slide':
+            frame = stripe_width / 2
+            stripe_width += frame*2
+
     # If a frame was passed in, adjust the x,y of all items to give them that much spacing as a frame
     try:
         frame = int(frame)
     except ValueError:
         frame = 0    
-    
-    if project.layout_mode == 'horizontal':
-        stripe_height = min(f.height for f in files) + frame
-    if project.layout_mode == 'vertical':
-        stripe_width = min(f.width for f in files) + frame
+
 
     # Calculate a new width/height for the files
     # based on making them all the same height

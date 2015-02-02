@@ -112,7 +112,7 @@ def num_files_local(request, project_id):
         project = Project.objects.get(pk=project_id)
     except Project.DoesNotExist:
         return HttpResponseNotFound()
-    return HttpResponse(str(project.files.count()))
+    return HttpResponse(str(project.num_files_local))
 
 def project(request, project_id):
     try:
