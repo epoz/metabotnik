@@ -21,6 +21,7 @@ class UserAdmin(UserAdmin):
     def make_active(self, request, queryset): 
         for user in queryset:
             user.is_active = True
+            user.save()
             send_mail('Hooray! Your Metabotnik login has been activated', 
                       'Welcome %s,\nYou can now start making some gigantic zoomable images.\nHave fun at https://metabotnik.com/\nIf you have any questions or comments feel free to mail us at info@metabotnik.com' % user.get_full_name(), 
                       'info@metabotnik.com', 
