@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from django.conf import settings
 
 from metabotnik.models import DropBoxInfo, Project, File, Task
 
@@ -14,6 +16,16 @@ class DropBoxInfoInline(admin.StackedInline):
 # Define a new User admin
 class UserAdmin(UserAdmin):
     inlines = (DropBoxInfoInline, )
+    actions = ['make_active'] 
+
+    def make_active(self, request, queryset): 
+        for user in queryset:
+            user.is_active = True
+            send_mail('Hooray! Your Metabotnik login has been activated', 
+                      'Welcome %s,\nYou can now start making some gigantic zoomable images.\nHave fun at https://metabotnik.com/\nIf you have any questions or comments feel free to mail us at info@metabotnik.com' % user.get_full_name(), 
+                      'info@metabotnik.com', 
+                      [address for name, address in settings.ADMINS]+[user.email], 
+                      fail_silently=True)
 
 # Re-register UserAdmin
 admin.site.unregister(User)
