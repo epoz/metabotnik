@@ -215,7 +215,7 @@ def horzvert_layout(project, frame=0):
                 'y': f.y, 
                 'width': f.new_width, 
                 'height': f.new_height,
-                'metadata': json.loads(f.metadata),
+                'metadata': f.metadata and json.loads(f.metadata) or {},
         }
         data['images'].append( tmp )
 
