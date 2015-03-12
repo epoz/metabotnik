@@ -68,7 +68,9 @@ def execute_task(task):
 
 def layout(payload):
     project = Project.objects.get(pk=payload['project_id'])
-    planodo.horzvert_layout(project)
+    data = planodo.horzvert_layout(project)
+    project.layout_data = json.dumps(data)
+    project.save()
 
 def makethumbnails(payload):
     project = Project.objects.get(pk=payload['project_id'])

@@ -57,6 +57,7 @@ $('#help1').click(function(event) {
 
 $('#save_metadata').click(function(event) {
     event.preventDefault();
+    $('#save_metadata').hide();
     var file_list = $('#file_list').val();
     if(!file_list) {
         alert('foo');

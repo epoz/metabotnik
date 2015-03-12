@@ -4,7 +4,7 @@
 {% block extra_style %}
 #thetip {display:none; width:350px; background-color:#fff; padding: 10px; -webkit-border-radius: 10; -moz-border-radius: 10; border-radius: 10;  z-index: 99999;}
 .needhighlight {
-    opacity: 0.2; filter: alpha(opacity=20); border: 2px solid #0A7EbE; outline: 10px auto #0A7EbE; background-color: white;
+    opacity: 0.2; filter: alpha(opacity=20); border: 2px solid #0A7EbE; outline: 4px auto #0A7EbE; background-color: white;
 }
 {% endblock %}
 
@@ -80,6 +80,10 @@ overlay_data = { {% for f in project.files.all %}{% if f.metadata %}overlay{{f.p
 
 setTimeout(function() {
     var tip = $('#thetip');
+    $(".needhighlight").click(function(e) {
+        var the_link = overlay_data[$(this)[0].id].LINK;
+        document.location = the_link;
+    });
     $(".needhighlight").hover(function(e) { 
         var the_link = overlay_data[$(this)[0].id].LINK;
         tip.html('<a href="' + the_link + '">' + the_link + '</a>');

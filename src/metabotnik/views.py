@@ -165,7 +165,8 @@ def json_project(request, project_id):
 
         project.layout_mode = layout
         project.background_color = background_color
-        horzvert_layout(project, frame=frame)
+        project.layout_data = json.dumps(horzvert_layout(project, frame=frame))
+        project.save()
 
     return HttpResponse(json.dumps(project.layout_as_dict()), content_type='application/json')
 
@@ -179,13 +180,13 @@ def metadata_project(request, project_id):
     if request.method == 'POST':
         file_list = request.POST.get('file_list', u'').strip(' \n\r')
         project.set_metadata(file_list)
-        horzvert_layout(project)
+        project.layout_data = json.dumps(horzvert_layout(project))
+        project.save()
         return HttpResponse('OK')
 
     textarea_rows = min(project.files.count(), 20)
     return render(request, 'metadata.html', 
-                 {'project':project, 'textarea_rows':textarea_rows, 'img_data':json.dumps(project.layout_as_dict())
-                 }) 
+                 {'project':project, 'textarea_rows':textarea_rows, 'img_data':project.layout_data})
 
 
 def sorting_project(request, project_id):
@@ -197,7 +198,8 @@ def sorting_project(request, project_id):
     if request.method == 'POST':
         file_list = request.POST.get('file_list', u'').strip(' \n\r').split('\n')
         project.set_file_order(file_list)
-        horzvert_layout(project)
+        project.layout_data = json.dumps(horzvert_layout(project))
+        project.save()
         return HttpResponse('OK')
 
     textarea_rows = min(project.files.count(), 20)

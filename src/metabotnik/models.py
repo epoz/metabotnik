@@ -41,26 +41,16 @@ class Project(models.Model):
     num_files_on_dropbox = models.IntegerField(default=0)
     created = models.DateTimeField(auto_now_add=True)
     layout_mode = models.CharField(max_length=100, choices=project_layout_choices, default='horizontal')
+    layout_data = models.TextField(null=True, blank=True)
     background_color = models.CharField(max_length=7, default='#ffffff')
-    preview_width = models.IntegerField(default=0)
-    preview_height = models.IntegerField(default=0)
     metabotnik_nonce = models.CharField(max_length=100, null=True, blank=True)
-    metabotnik_width = models.IntegerField(default=0)
-    metabotnik_height = models.IntegerField(default=0)
     public = models.BooleanField(default=False)
     storage_size = models.IntegerField(default=0)
 
     def layout_as_dict(self):
-        data = {'width':self.metabotnik_width, 'height':self.metabotnik_height }    
-        data['images']  = []
-        for f in self.files.all():
-            random_colour = '%x' % random.randint(0,180)
-            tmp = {'x':f.x, 'y':f.y, 'width':f.new_width, 'height':f.new_height, 
-                   'pk':f.pk, 'filename':f.filename, 'fill_style': '#%s' % (random_colour*3)}
-            if f.metadata:
-                tmp['metadata'] = json.loads(f.metadata)
-            data['images'].append(tmp)
-        return data
+        if not self.layout_data:
+            return {}
+        return json.loads(self.layout_data)
 
     def calc_storage_size(self):
         'Returns the number of bytes of storage used by this project, sets the storage_size attribute'
@@ -115,7 +105,7 @@ class Project(models.Model):
 
     def set_metadata(self, textbase_buffer):
         data = {}
-        for tmp in textbase.TextBase(str(textbase_buffer)):
+        for tmp in textbase.TextBase(textbase_buffer.encode('utf8')):
             data[tmp.get('FILENAME', [None])[0]] = tmp
         for f in self.files.all():
             metadata = data.get(f.filename)
@@ -252,7 +242,10 @@ def new_task(user, payload):
     'Where payload is a dict containing the task details'
     tmp = json.dumps(payload)
     action = payload.get('action')
-    return Task.objects.create(action=action, payload_data=tmp, user=user)
+    project = payload.get('project_id')
+    if project:
+        project = Project.objects.get(pk=project)
+    return Task.objects.create(action=action, project=project, payload_data=tmp, user=user)
 
 # class Viewpoint(models.Model):
 #     user = models.ForeignKey(User, related_name='tasks')

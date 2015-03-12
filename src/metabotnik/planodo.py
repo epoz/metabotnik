@@ -2,6 +2,7 @@ import os
 import math, random
 from PIL import Image
 import warnings
+import json
 from django.db import connection
 
 # Disable the warnings for giant images
@@ -56,6 +57,9 @@ def phorzvert_layout(project, frame=None):
     project.save()
 
 def horzvert_layout(project, frame=0):
+    '''Do the layout and produce a usable dict output that can be persisted with the Project.
+    We used to save these as attributes in the File objects.
+    '''
     # Allow overrriding the row_height by having a paramater passed in
     files = list(project.files.all())
 
@@ -195,47 +199,57 @@ def horzvert_layout(project, frame=0):
         canvas_width = stripe_width
         canvas_height = stripe_height
 
+    data = {
+        'version':1, 
+        'width': canvas_width, 
+        'height': canvas_height,
+        'background_color': project.background_color,
+        'images': []
+    }
+
     # And save all the modified attributes
     for f in new_files:
-#        f.save()  # Taking WAAAAAAY too long doing a regular save, so some raw SQL called for.
-        cursor = connection.cursor()
-        cursor.execute('UPDATE metabotnik_file SET x = %s, y = %s, new_width = %s, new_height = %s WHERE id = %s',
-                       (f.x, f.y, f.new_width, f.new_height, f.pk))
+        random_colour = '%x' % random.randint(0,180)
+        tmp = { 'pk':f.pk, 'filename':f.filename, 'fill_style': '#%s' % (random_colour*3),
+                'x': f.x, 
+                'y': f.y, 
+                'width': f.new_width, 
+                'height': f.new_height,
+                'metadata': json.loads(f.metadata),
+        }
+        data['images'].append( tmp )
 
-
-    # Remember that in some calls that pass in project, the attributes (like layout_mode) might be modified already
-    project.metabotnik_width = canvas_width
-    project.metabotnik_height = canvas_height
-    project.save()
+    return data
 
 def make_bitmap(project, filepath):
     'Given the layout coordinates for @project, generate a bitmap and save it under @filename'
     # Make the gigantic bitmap, if it is too large try and scale down the size using horzvert_layout iteratively
-    max_width= 65000
-    max_height = 65000
+    MAX_WIDTH= 65000
+    MAX_HEIGHT = 65000
 
-    if project.metabotnik_width > 65000:
-        raise Exception('Width %s is > %s' % (project.metabotnik_width, max_width))
-    if project.metabotnik_height > 65000:
-        raise Exception('Height %s is > %s' % (project.metabotnik_height, max_height))
+    layout_data = project.layout_as_dict()
+
+
+    if layout_data['width'] > 65000:
+        raise Exception('Width %s is > %s' % (layout_data['width'], MAX_WIDTH))
+    if layout_data['height'] > 65000:
+        raise Exception('Height %s is > %s' % (layout_data['height'], MAX_HEIGHT))
 
     msgs = []
-    large = Image.new('RGBA', (project.metabotnik_width, project.metabotnik_height), color=project.background_color)
-    for f in project.files.all():
+    large = Image.new('RGBA', (layout_data['width'], layout_data['height']), color=layout_data['background_color'])
+    for f in layout_data.get('images', []):
         try:
-            img = Image.open(os.path.join(project.originals_path, f.filename))
+            img = Image.open(os.path.join(project.originals_path, f['filename']))
             i_width, i_height = img.size
-            if i_width != f.new_width or i_height != f.new_height:
-                img = img.resize((f.new_width, f.new_height), Image.ANTIALIAS)
+            if i_width != f['width'] or i_height != f['height']:
+                img = img.resize((f['width'], f['height']), Image.ANTIALIAS)
         except IOError:
-            msgs.append('Problem with %s' % f.filename)
+            msgs.append('Problem with %s' % f['filename'])
             continue
         if img.mode == 'RGBA':
-            large.paste(img, (f.x, f.y), img)
+            large.paste(img, (f['x'], f['y']), img)
         else:
-            large.paste(img, (f.x, f.y))
-
+            large.paste(img, (f['x'], f['y']))
     large.save(filepath)
-    project.metabotnik_width, project.metabotnik_height = large.size
 
     return msgs

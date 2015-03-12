@@ -5,6 +5,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 
 from metabotnik.models import DropBoxInfo, Project, File, Task
+from metabotnik.tasks import execute_task
 
 # Define an inline admin descriptor for Employee model
 # which acts a bit like a singleton
@@ -50,4 +51,10 @@ class TaskAdmin(admin.ModelAdmin):
     list_display = ('project', 'action', 'status', 'user_full_name', 'created', 'time_ended', 'duration')
     list_filter = ('action', 'status',)
     date_hierarchy = 'created'
+    actions = ['execute']
+
+    def execute(self, request, queryset):
+        for task in queryset:
+            execute_task(task)
+
 admin.site.register(Task, TaskAdmin)
