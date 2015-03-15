@@ -50,7 +50,7 @@ class Project(models.Model):
 
     def layout_as_dict(self):
         if not self.layout_data:
-            self.layout_data = horzvert_layout(self)
+            self.layout_data = json.dumps(horzvert_layout(self))
             self.save()
         return json.loads(self.layout_data)
 
