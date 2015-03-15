@@ -6,8 +6,9 @@ from django.template.defaultfilters import filesizeformat
 import json
 import os
 import shutil
-import random
 import textbase
+from metabotnik.planodo import horzvert_layout
+
 
 class DropBoxInfo(models.Model):
     user = models.OneToOneField(User, primary_key=True)
@@ -49,7 +50,8 @@ class Project(models.Model):
 
     def layout_as_dict(self):
         if not self.layout_data:
-            return {}
+            self.layout_data = horzvert_layout(self)
+            self.save()
         return json.loads(self.layout_data)
 
     def calc_storage_size(self):
