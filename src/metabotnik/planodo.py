@@ -62,6 +62,8 @@ def horzvert_layout(project, frame=0):
     '''
     # Allow overrriding the row_height by having a paramater passed in
     files = list(project.files.all())
+    if len(files) < 1:
+        return {}
 
     if project.layout_mode == 'horizontal':
         stripe_height = min(f.height for f in files)
