@@ -114,7 +114,7 @@ def horzvert_layout(project, frame=0):
     if project.layout_mode == 'horizontal':
         stripe_size = count_per_stripe * (average_width+frame*count_per_stripe)
         stripe_width = stripe_size
-    elif project.layout_mode == 'vertical':
+    elif project.layout_mode.startswith('vertical'):
         stripe_size = count_per_stripe * (average_height+frame*count_per_stripe)
         stripe_height = stripe_size        
     else:
