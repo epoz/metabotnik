@@ -70,7 +70,7 @@ def horzvert_layout(project, frame=0):
         if frame == 'slide':
             frame = stripe_height / 2
             stripe_height += frame*2
-    if project.layout_mode == 'vertical':
+    if project.layout_mode.startswith('vertical'):
         stripe_width = max(f.width for f in files)
         if frame == 'slide':
             frame = stripe_width / 2
@@ -155,7 +155,7 @@ def horzvert_layout(project, frame=0):
                 x = 0
                 y += stripe_height
                 y += frame
-        elif project.layout_mode == 'vertical':
+        elif project.layout_mode.startswith('vertical')::
             if ((cur_size + thefile.new_height) < margin):
                 thefile.x = x
                 thefile.y = y
@@ -195,6 +195,9 @@ def horzvert_layout(project, frame=0):
         for f in new_files:
             offset = (stripe_height - stripes[f.stripe]) / 2
             f.y = f.y+offset
+        canvas_width = stripe_width * len(stripes)
+        canvas_height = stripe_height
+    elif project.layout_mode == 'verticaltop':
         canvas_width = stripe_width * len(stripes)
         canvas_height = stripe_height
     else:
