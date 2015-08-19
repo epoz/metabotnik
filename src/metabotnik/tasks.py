@@ -13,6 +13,7 @@ from PIL import Image
 from metabotnik.xmp import read_metadata
 import random
 import shutil
+from natsort import natsorted
 
 class RetryTaskException(Exception):
     'Raise this Exception in a task to have it retried later'
@@ -196,7 +197,7 @@ def extract_metadata(payload):
         current_files[image.filename] = image
     #  For every file, read the metadata
     order = 1
-    for filename in sorted(os.listdir(project.originals_path)):
+    for filename in natsorted(os.listdir(project.originals_path)):
         if not filename.endswith('.jpg'):
             continue
         filepath = os.path.join(project.originals_path, filename)
