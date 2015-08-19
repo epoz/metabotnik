@@ -66,12 +66,12 @@ def horzvert_layout(project, frame=0):
         return {}
 
     if project.layout_mode == 'horizontal':
-        stripe_height = min(f.height for f in files)
+        stripe_height = max(f.height for f in files)
         if frame == 'slide':
             frame = stripe_height / 2
             stripe_height += frame*2
     if project.layout_mode == 'vertical':
-        stripe_width = min(f.width for f in files)
+        stripe_width = max(f.width for f in files)
         if frame == 'slide':
             frame = stripe_width / 2
             stripe_width += frame*2
