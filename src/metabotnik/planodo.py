@@ -93,7 +93,7 @@ def horzvert_layout(project, frame=0):
                 f.new_width = int(stripe_height*ratio)
             else:
                 f.new_width = f.width
-        elif project.layout_mode == 'vertical':
+        elif project.layout_mode.startswith('vertical'):
             f.new_width = stripe_width
             if f.width != stripe_width:
                 ratio = float(f.height)/float(f.width)

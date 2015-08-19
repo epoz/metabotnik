@@ -46,6 +46,7 @@
          <select id="layout">
              <option value="horizontal"{% if project.layout_mode == 'horizontal'%} selected="1"{% endif %}>horizontal layout</option>
              <option value="vertical"{% if project.layout_mode == 'vertical'%} selected="1"{% endif %}>vertical layout</option>
+             <option value="verticaltop"{% if project.layout_mode == 'verticaltop'%} selected="1"{% endif %}>vertical-top layout</option>
              <option value="random" {% if project.layout_mode == 'random'%} selected="1"{% endif %}>random layout</option>
          </select>
          <select id="background_color">
