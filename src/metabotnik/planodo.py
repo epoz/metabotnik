@@ -155,7 +155,7 @@ def horzvert_layout(project, frame=0):
                 x = 0
                 y += stripe_height
                 y += frame
-        elif project.layout_mode.startswith('vertical')::
+        elif project.layout_mode.startswith('vertical'):
             if ((cur_size + thefile.new_height) < margin):
                 thefile.x = x
                 thefile.y = y
