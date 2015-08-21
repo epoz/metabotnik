@@ -1,6 +1,114 @@
 OPENSEADRAGON CHANGELOG
 =======================
 
+2.0.0:
+
+* True multi-image mode (#450)
+    * BREAKING CHANGE: Passing an array for the tileSources option is no longer enough to trigger sequence mode; you have to set the sequenceMode option to true as well
+    * BREAKING CHANGE: Navigator no longer sends an open event when its viewer opens
+    * BREAKING CHANGE: Viewer.drawers and Viewer.drawersContainer no longer exist
+    * BREAKING CHANGE: A Viewer's Drawer and Viewport are now made once per Viewer and reused for every image that Viewer opens (rather than being recreated for every open); this means if you change Viewer options between opens, the behavior is different now.
+    * DEPRECATION: use Viewer.addTiledImage instead of Viewer.addLayer
+        * addTiledImage supports positioning config properties
+    * DEPRECATION: use World.getItemAt instead of Viewer.getLayerAtLevel
+    * DEPRECATION: use World.getIndexOfItem instead of Viewer.getLevelOfLayer
+    * DEPRECATION: use World.getItemCount instead of Viewer.getLayersCount
+    * DEPRECATION: use World.setItemIndex instead of Viewer.setLayerLevel
+    * DEPRECATION: use World.removeItem instead of Viewer.removeLayer
+    * DEPRECATION: use World.needsDraw instead of Drawer.needsUpdate
+    * DEPRECATION: use TileCache.numTilesLoaded instead of Drawer.numTilesLoaded
+    * DEPRECATION: use World.resetItems instead of Drawer.reset
+    * DEPRECATION: use Drawer.clear and World.draw instead of Drawer.update
+    * DEPRECATION: the layersAspectRatioEpsilon option is no longer necessary
+    * DEPRECATION: Viewer's add-layer event is now World's add-item event
+    * DEPRECATION: Viewer's layer-level-changed event is now World's item-index-change event
+    * DEPRECATION: Viewer's remove-layer event is now World's remove-item event
+    * DEPRECATION: Viewer's add-layer-failed event is now add-item-failed
+    * DEPRECATION: TileSourceCollection has been retired in favor of World
+    * DEPRECATION: collectionMode no longer draws outlines or reflections for items
+    * Drawer has been split into three classes:
+        * TiledImage, tile management and positioning for a single tiled image
+        * TileCache, tile caching for all images
+        * Drawer, tile drawing for all images
+    * New class: World, keeps track of multiple images in the scene
+    * Viewer now has world and tileCache properties
+    * Rect and Point now have clone functions
+    * New Viewport method for managing homeBounds as well as constraints: setHomeBounds
+    * Viewport.open supports positioning config properties
+    * For multi-image open, drawing isn't started until all tileSources have been opened
+    * You can specify a clip area for each image (only works on browsers that support the HTML5 canvas) (#594)
+    * Added placeholderFillStyle so image rectangles can be drawn even before their tiles load (#635)
+    * Ability to set opacity on individual TiledImages (#644)
+* Margins option to push the home region in from the edges of the Viewer (#505)
+* Rect and Point toString() functions are now consistent: rounding values to nearest hundredth
+* Overlays appear in the DOM immediately on open or addOverlay (#507)
+* imageLoaderLimit now works (#544)
+* Turning off scrollToZoom in gestureSettings now allows scroll events to propagate
+* You can now set a minZoomLevel that's greater than the home zoom level
+* Added union() to OpenSeadragon.Rect
+* Fixed an error in fitBounds if the new and old bounds were extremely close in size
+* Added ajaxWithCredentials option (#543)
+* Added viewport-change event for after the viewport changes but before it's drawn
+* A spring's current value is now updated immediately on reset (#524)
+* Fixed an error in fitBounds that occurred sometimes with immediately = true
+* Added support for HDPI (retina) displays (#583)
+* Corrected IIIF tile source to use canonical syntax (#586)
+* Fixed x/y typo that caused horizontal reference strip to be rendered only relative to height (#595)
+* Fixed Firefox 35 not able to open local files (#588)
+* Fixed an issue with zero size viewers in IE8 (#609)
+* Fixed: Cross Origin policy not working (#613)
+* Optimized tile loading by clearing the queue on a re-draw when imageLoaderLimit is set (#616)
+* Now animating zoom spring exponentially (#631)
+* Added http://editorconfig.org/ config file (#637)
+* Keyboard pan speed is now the same regardless of zoom level (#645)
+
+1.2.1:
+
+* Added preserveOverlays option (#561)
+* Fixed: DZI tilesource was broken on IE8/IE9 (#563)
+* Exposed secondary pointer button (middle, right, etc.) events from MouseTracker and through viewer (#479)
+* MouseTracker - Improved IE 8 compatibility (#562)
+* MouseTracker - Improved IE 9+ compatibility (#564)
+* MouseTracker - Simulated touchenter/touchleave events now bubble to parent element MouseTrackers (#566)
+* MouseTracker - Improved multitouch support in enter/exit event handlers (#566)
+* MouseTracker - orphaned tracked touch pointers removed (fix for #539)
+* MouseTracker - removed touchenter/touchleave event support since the events don't exist on any known platform and have been removed from the W3C specification (#566)
+* Removed Viewer onContainerPress/onContainerRelease handlers (and the associated 'container-release' event ) that were never fired due to the canvas (child) element capturing the DOM events (#566)
+* Added 'canvas-enter', 'canvas-exit', and 'canvas-press' events to Viewer (#566)
+* ButtonGroup - removed obsolete MouseTracker event handlers (#566)
+* MouseTracker - added keydown and keyup handlers (#568)
+* Modifier keys ignored in keyboard navigation handlers (#503)
+* Requesting keyboard focus when viewer is clicked (#537)
+* Arrow key navigation fixed across platforms (#565)
+* Removed textarea element from viewer DOM. Viewer.canvas now handles keyboard navigation (#569)
+* Removed 'position' property from MouseTracker keyDownHandler/keyUpHandler/keyHandler functions (#573)
+* Fixed pointer event model detection for IE 10 and IE 11 (#571)
+* Added setMouseNavEnabled() support to Navigator (#572)
+* MouseTracker now defaults to tracking on (#558)
+* Removed Viewer focusHandler/onCanvasFocus (#577)
+* Added tabIndex option to viewer (#577)
+
+1.2.0:
+
+* New combined IIIF TileSource for 1.0 through 2.0 (#441)
+    * BREAKING CHANGE: Removed IIIF1_1TileSource (now that IIIFTileSource supports all versions)
+* Allowed TileSources to have dynamic tileSize via source.getTileSize(level) (#441)
+    * DEPRECATION: Use .getTileSize(level) instead of .tileSize
+* Fix for IIPServer-style urls when using DZI (#413)
+* Fix memory leak while destroying the viewer (#421)
+* Added fitBoundsWithConstraints() to the viewport (#423)
+* Fixed MouseTracker cross-browser issues with tracking pointers over and out of the tracked element (pull request #448, fix for #152, #404, #420, and #427)
+* Fixed incorrect flick direction after image is rotated (#452)
+* Debug mode now works with rotate images (#453)
+* Now supporting dzi xml with namespaces (#462)
+* You can now rotate the navigator along with the main viewer (#455)
+* Viewport.setRotation now allows all rotation angles (#466)
+* Pinch rotate is now available (defaults to off) (#468)
+* Added option for home button to fill viewer (#474)
+* Better handling of mid-update image loaded callbacks (#409)
+* Tracked pointers are now cleaned up when Viewer.setMouseNavEnabled(false) is called (#518)
+* Added explicit pointer capture for touch event model touchstart events (#552)
+
 1.1.1:
 
 * Fixed issue with dragging the navigator highlight on Webkit browsers (#395)
