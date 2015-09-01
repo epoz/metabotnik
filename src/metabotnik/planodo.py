@@ -233,7 +233,8 @@ def make_bitmap(project, filepath):
     MAX_HEIGHT = 65000
 
     layout_data = project.layout_as_dict()
-
+    if not layout_data:
+        layout_data = horzvert_layout(project)
 
     if layout_data['width'] > 65000:
         raise Exception('Width %s is > %s' % (layout_data['width'], MAX_WIDTH))
