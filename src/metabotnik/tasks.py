@@ -120,6 +120,9 @@ def generate(payload):
     if project.num_files_local < project.num_files_on_dropbox:
         raise RetryTaskException('Local files < Dropbox files')
 
+    # Always first do a layout for the project using the current settings before generation
+    # Especially neded where users do not first do a 'preview' before hitting generate button
+    layout(payload)
 
     if payload.get('preview'):
         filename = os.path.join(project.storage_path, 'preview.jpg')
