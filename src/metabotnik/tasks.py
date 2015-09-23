@@ -69,8 +69,7 @@ def execute_task(task):
 
 def layout(payload):
     project = Project.objects.get(pk=payload['project_id'])
-
-    data = planodo.layout(project, scale_factor=scale_factor)
+    data = planodo.layout(project)
     project.layout_data = json.dumps(data)
     project.save()
 
