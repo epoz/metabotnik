@@ -56,7 +56,26 @@ def phorzvert_layout(project, frame=None):
     project.metabotnik_height = last_file.height
     project.save()
 
-def horzvert_layout(project, frame=0):
+def layout(project, frame=0):
+
+    width = MAX_WIDTH + 1
+    height = MAX_HEIGHT + 1
+
+    iterations = 0
+    scale_factor = 1
+    while (width > MAX_WIDTH) or (height > MAX_HEIGHT):
+        data = horzvert_layout(project, frame=frame, scale_factor=scale_factor)
+        iterations += 1
+        if iterations > 10:
+            raise Exception("Layout iterations exceeds 10")        
+        scale_factor -= 0.1
+        if scale_factor <= 0:
+            raise Exception("Layout scale_fator <= 0")
+        width = data.get('width', 0)
+        height = data.get('height', 0)
+    return data
+
+def horzvert_layout(project, frame=0, scale_factor=1):
     '''Do the layout and produce a usable dict output that can be persisted with the Project.
     We used to save these as attributes in the File objects.
     '''
@@ -66,12 +85,12 @@ def horzvert_layout(project, frame=0):
         return {}
 
     if project.layout_mode == 'horizontal':
-        stripe_height = max(f.height for f in files)
+        stripe_height = int(max(f.height for f in files) * scale_factor)
         if frame == 'slide':
             frame = stripe_height / 2
             stripe_height += frame*2
     if project.layout_mode.startswith('vertical'):
-        stripe_width = max(f.width for f in files)
+        stripe_width = int(max(f.width for f in files) * scale_factor)
         if frame == 'slide':
             frame = stripe_width / 2
             stripe_width += frame*2
@@ -226,11 +245,12 @@ def horzvert_layout(project, frame=0):
 
     return data
 
+MAX_WIDTH = 65000
+MAX_HEIGHT = 65000
+
 def make_bitmap(project, filepath):
     'Given the layout coordinates for @project, generate a bitmap and save it under @filename'
     # Make the gigantic bitmap, if it is too large try and scale down the size using horzvert_layout iteratively
-    MAX_WIDTH= 65000
-    MAX_HEIGHT = 65000
 
     layout_data = project.layout_as_dict()
     if not layout_data:

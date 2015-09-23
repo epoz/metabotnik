@@ -7,7 +7,7 @@ from django.db.models.query_utils import Q
 from django.conf import settings
 from dropbox.client import DropboxClient
 from metabotnik.models import Project, new_task
-from metabotnik.planodo import horzvert_layout
+import metabotnik.planodo
 import os
 import mimetypes
 import subprocess
@@ -165,7 +165,7 @@ def json_project(request, project_id):
 
         project.layout_mode = layout
         project.background_color = background_color
-        project.layout_data = json.dumps(horzvert_layout(project, frame=frame))
+        project.layout_data = json.dumps(metabotnik.planodo.layout(project, frame=frame))
         project.save()
 
     return HttpResponse(json.dumps(project.layout_as_dict()), content_type='application/json')
@@ -180,7 +180,7 @@ def metadata_project(request, project_id):
     if request.method == 'POST':
         file_list = request.POST.get('file_list', u'').strip(' \n\r')
         project.set_metadata(file_list)
-        project.layout_data = json.dumps(horzvert_layout(project))
+        project.layout_data = json.dumps(metabotnik.planodo.layout(project))
         project.save()
         return HttpResponse('OK')
 
@@ -198,7 +198,7 @@ def sorting_project(request, project_id):
     if request.method == 'POST':
         file_list = request.POST.get('file_list', u'').strip(' \n\r').split('\n')
         project.set_file_order(file_list)
-        project.layout_data = json.dumps(horzvert_layout(project))
+        project.layout_data = json.dumps(metabotnik.planodo.layout(project))
         project.save()
         return HttpResponse('OK')
 
