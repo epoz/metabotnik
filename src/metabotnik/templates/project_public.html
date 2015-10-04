@@ -8,6 +8,12 @@
 }
 {% endblock %}
 
+{% block extra_head %}
+<meta property="og:title" content="{{project.name|default:"A Metabotnik!"}}" />
+{% if project.description %}<meta property="og:description" content="{project.description}}" />{% endif %}
+<meta property="og:image" content="https://metabotnik.com/s/project_{{project.pk}}/{{project.metabotnik_nonce}}/8/0_0.jpg" />
+{% endblock extra_head %}
+
 {% block maincontent %}
 <div id="thetip">
     <p>Some text to go here...</p>
