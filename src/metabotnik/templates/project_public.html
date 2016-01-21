@@ -11,7 +11,7 @@
 {% block extra_head %}
 <meta property="og:title" content="{{project.name|default:"A Metabotnik!"}}" />
 {% if project.description %}<meta property="og:description" content="{project.description}}" />{% endif %}
-<meta property="og:image" content="https://metabotnik.com/s/project_{{project.pk}}/{{project.metabotnik_nonce}}/8/0_0.jpg" />
+<meta property="og:image" content="https://metabotnik.com/s/project_{{project.pk}}/{{project.metabotnik_nonce}}_files/8/0_0.jpg" />
 {% endblock extra_head %}
 
 {% block maincontent %}
@@ -28,7 +28,7 @@
 {% endif %}
 
 {% if project.description %}
-<div>{{project.description}}</div>
+<div>{{project.description|markdown:"safe"}}</div>
 {% endif %}
 
 </div>
