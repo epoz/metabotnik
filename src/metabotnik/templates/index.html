@@ -33,9 +33,4 @@
             viewer1.addTiledImage({tileSource:'/s/project_{{p.pk}}/{{p.metabotnik_nonce}}.dzi'});
 {% endfor %}
             
-        $(function() {
-            setTimeout(function() { 
-                    viewer1.viewport.zoomTo(1, new OpenSeadragon.Point(0.5, 0.319));  
-                }, 1000);
-        });
 {% endblock extra_javascript_end %}
