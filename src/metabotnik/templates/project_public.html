@@ -4,9 +4,6 @@
 
 {% block extra_style %}
 #thetip {display:none; width:350px; background-color:#fff; padding: 10px; -webkit-border-radius: 10; -moz-border-radius: 10; border-radius: 10;  z-index: 99999;}
-.needhighlight {
-    opacity: 0.2; filter: alpha(opacity=20); border: 2px solid #0A7EbE; outline: 4px auto #0A7EbE; background-color: white;
-}
 {% endblock %}
 
 {% block extra_head %}
@@ -49,7 +46,11 @@
 <p>This project has not produced a metabotnik yet.</p>
 {% endif %}
 
-
+{% for f in project.files.all %}{% if f.metadata %}<div class="needhighlight" id="overlay{{f.pk}}"><img src="https://metabotnik.com/eye-512px.svg" width="20"></div>
+{% if not forloop.last %},{% endif %}
+{% endif %}    
+{% endfor %}};
+    
 {% endblock maincontent %}
 
 {% block extra_javascript_end %}
