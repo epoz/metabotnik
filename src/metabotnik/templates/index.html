@@ -22,15 +22,15 @@
 {% block extra_javascript_end %}
             var viewer1 = OpenSeadragon({
                 id:            "thedzi1",
-                maxZoomPixelRatio: 100,
                 prefixUrl:     '{{STATIC_URL}}openseadragon/images/',
                 showNavigator:  false,
                 collectionMode: true,
-                zoomPerScroll:  1.05,
-                zoomPerSecond:  5,
             });
 {% for p in projects %}
             viewer1.addTiledImage({tileSource:'/s/project_{{p.pk}}/{{p.metabotnik_nonce}}.dzi'});
 {% endfor %}
+            viewer1.viewport.goHome();  
+
+
             
 {% endblock extra_javascript_end %}
