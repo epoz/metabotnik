@@ -8,15 +8,7 @@
 
         </div>
 
-<div class="spanhalf">         
-        <h3 title="From the Special Collections department at the University of Amsterdam Library">500 years of beautiful typography</h3>
-        <div id="thedzi1" class="openseadragon" style="height: 200px; margin-bottom: 40px"></div>
-
-        <h4 title="From the Special Collections department at the University of Amsterdam Library">Ovid's Metamorphoses revisited - 16th century Italian initials</h4>
-        <div id="thedzi2" class="openseadragon" style="height: 200px;"></div>
-</div>
-
-<div style="width: 500px; padding-left: 50px">
+<div style="width: 500px; padding-left: 50px; margin: 0 auto">
     <h1>How does it work?</h1>
     <ul>
 
@@ -41,43 +33,3 @@
 </div>
         
 {% endblock maincontent %}
-
-{% block extra_javascript_end %}
-            var viewer1 = OpenSeadragon({
-                id:            "thedzi1",
-                maxZoomPixelRatio: 100,
-                prefixUrl:     '{{STATIC_URL}}openseadragon/images/',
-                showNavigator:  false,
-                zoomPerScroll:  1.05,
-                zoomPerSecond:  5,
-                tileSources:   {
-                    Image: {
-                        xmlns:    "http://schemas.microsoft.com/deepzoom/2008",
-                        Url:      "http://arkyves.org/z/ABB_files/",
-                        Format:   "jpg", 
-                        Overlap:  "1", 
-                        TileSize: "256",
-                        Size: {
-                            Height: "59400",
-                            Width:  "65000"
-                        }
-                    }
-                }
-            });
-            var viewer2 = OpenSeadragon({
-                id:            "thedzi2",
-                maxZoomPixelRatio: 100,
-                prefixUrl:     '{{STATIC_URL}}openseadragon/images/',
-                showNavigator:  false,
-                zoomPerScroll:  1.05,
-                zoomPerSecond:  5,
-                tileSources: "/s/project_35/deepzoom.dzi"
-            });
-            
-        $(function() {
-            setTimeout(function() { 
-                    viewer1.viewport.zoomTo(1, new OpenSeadragon.Point(0.5, 0.319));  
-                    viewer2.viewport.zoomTo(1, new OpenSeadragon.Point(0.5, 0.319));
-                }, 1000);
-        });
-{% endblock extra_javascript_end %}
