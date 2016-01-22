@@ -2,36 +2,13 @@
 
 {% block maincontent %}
     
-        <div class="shout" style="margin-bottom: 40px">
-            <h1>Create huge <a href="{% url 'projects'%}" style="text-decoration: none">zoomable images</a></h1>
-            <p>Try zooming in &amp; out, click and drag.</p>
-
-        </div>
-
-<div class="spanhalf">         
-        <h3 title="From the Special Collections department at the University of Amsterdam Library">500 years of beautiful typography</h3>
-        <div id="thedzi1" class="openseadragon" style="height: 200px; margin-bottom: 40px"></div>
-
-        <h4 title="From the Special Collections department at the University of Amsterdam Library">Ovid's Metamorphoses revisited - 16th century Italian initials</h4>
-        <div id="thedzi2" class="openseadragon" style="height: 200px;"></div>
+<div class="shout" style="margin-bottom: 40px; height: 100px">
+    <h1>Create your own huge <a href="{% url 'projects'%}" style="text-decoration: none">zoomable images</a> here</h1>
+    <p>Try zooming in &amp; out, click and drag.</p>
 </div>
 
-<div style="width: 500px; padding-left: 50px">
-    <h1>How does it work?</h1>
-    <ul>
-
-    <li>Use your Dropbox account to log in.</li>
-    <li>A folder called <em>/Apps/Metabotnik</em> is now created in your Dropbox</li>
-    <li>Make a folder in your <em>/Apps/Metabotnik</em> Dropbox</li>
-    <li>Fill it with images - take care that they have the order you want</li>
-    <li>Click the Start button below</li>
-                </ul>
-    <p>Your zoomable file is now being created<br>
-    Wait for the mail that tells you the work is done<br>
-    Enjoy and share your work!<br>
-    </p>
-
-                <a href="/folders/" class="conversionbutton">Start</a>
+<div style="width: 100%;">
+    <div id="thedzi1" class="openseadragon" style="height: 500px;"></div>
 </div>
 
 <div style="text-align: center; margin-top: 75px; font-size: 75%; clear: both;">
@@ -50,34 +27,14 @@
                 showNavigator:  false,
                 zoomPerScroll:  1.05,
                 zoomPerSecond:  5,
-                tileSources:   {
-                    Image: {
-                        xmlns:    "http://schemas.microsoft.com/deepzoom/2008",
-                        Url:      "http://arkyves.org/z/ABB_files/",
-                        Format:   "jpg", 
-                        Overlap:  "1", 
-                        TileSize: "256",
-                        Size: {
-                            Height: "59400",
-                            Width:  "65000"
-                        }
-                    }
-                }
             });
-            var viewer2 = OpenSeadragon({
-                id:            "thedzi2",
-                maxZoomPixelRatio: 100,
-                prefixUrl:     '{{STATIC_URL}}openseadragon/images/',
-                showNavigator:  false,
-                zoomPerScroll:  1.05,
-                zoomPerSecond:  5,
-                tileSources: "/s/project_35/deepzoom.dzi"
-            });
+{% for p in projects %}
+            viewer1.addTiledImage({tileSource:'/s/project_{{p.pk}}/{{p.metabotnik_nonce}}.dzi'});
+{% endfor %}
             
         $(function() {
             setTimeout(function() { 
                     viewer1.viewport.zoomTo(1, new OpenSeadragon.Point(0.5, 0.319));  
-                    viewer2.viewport.zoomTo(1, new OpenSeadragon.Point(0.5, 0.319));
                 }, 1000);
         });
 {% endblock extra_javascript_end %}

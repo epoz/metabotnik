@@ -22,8 +22,8 @@ def s(request, path):
         return HttpResponse(open(fullpath).read(), content_type=type)
     return HttpResponseNotFound('%s not found' % path)
 
-def home(request):
-    return render(request, 'index.html')
+def home(request):    
+    return render(request, 'index.html', {'projects':Project.objects.filter(public=True)})
 
 def help(request, page):
     return render(request, 'help/%s.html' % page)
