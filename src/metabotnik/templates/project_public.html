@@ -47,9 +47,8 @@
 {% endif %}
 
 {% for f in project.files.all %}{% if f.metadata %}<div class="needhighlight" id="overlay{{f.pk}}"><img src="https://metabotnik.com/eye-512px.svg" width="20"></div>
-{% if not forloop.last %},{% endif %}
 {% endif %}    
-{% endfor %}};
+{% endfor %}
     
 {% endblock maincontent %}
 
