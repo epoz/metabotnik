@@ -46,7 +46,7 @@
 <p>This project has not produced a metabotnik yet.</p>
 {% endif %}
 
-{% for f in project.files.all %}{% if f.metadata %}<div class="needhighlight" id="overlay{{f.pk}}"><img src="https://metabotnik.com/eye-512px.svg" width="20"></div>
+{% for f in project.files.all %}{% if "LINK" in f.metadata %}<div class="needhighlight" id="overlay{{f.pk}}"><img src="https://metabotnik.com/eye-512px.svg" width="20"></div>
 {% endif %}    
 {% endfor %}
     
