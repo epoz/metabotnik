@@ -17,6 +17,6 @@ def json_to_overlay(datadict):
     width, height = float(datadict['width']), float(datadict['height'])
     for i,obj in enumerate(datadict.get('images', [])):
         if 'LINK' in obj.get('metadata', {}):
-            tmp = (obj['pk'], obj['x'], obj['y'])
+            tmp = (obj['pk'], obj['x']+10, obj['y']+100)
             buf.append(u"{id: 'overlay%s', px:%s, py:%s}" % tmp)
     return u'\n,'.join(buf)
