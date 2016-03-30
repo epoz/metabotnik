@@ -27,7 +27,7 @@ def loginview(request):
 def dropboxauthredirect(request):
     try:
         access_token, user_id, url_state = \
-                get_dropbox_auth_flow(request).finish(request.REQUEST)        
+                get_dropbox_auth_flow(request).finish(request.GET)        
         user = authenticate(user_id=user_id, access_token=access_token)
         if user.is_active:
             login(request, user)
