@@ -9,7 +9,7 @@ def main(request):
 
 def view(request, name):
     err = None
-    r = requests.get('https://metabotnik.com/static/misc/%s' % name)
+    r = requests.get('https://metabotnik.com/static/misc/%s' % name, verify=False)
     if r.status_code == 200:
         name_data = r.text
         projects = []
