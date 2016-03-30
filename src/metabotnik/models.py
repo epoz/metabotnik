@@ -253,3 +253,14 @@ def new_task(user, payload):
 #     user = models.ForeignKey(User, related_name='tasks')
 #     project = models.ForeignKey(Project, related_name='files')
 # #    next = models.OneToOneField
+
+class Composite(models.Model):
+    user = models.ForeignKey(User, related_name='composites')
+    created = models.DateTimeField(auto_now_add=True)
+    last_modified = models.DateTimeField(auto_now=True)
+    data = models.TextField()
+
+class CompositeNonce(models.Model):
+    user = models.ForeignKey(User, related_name='composite_nonces')
+    composite = models.ForeignKey(Composite, related_name='nonces')
+    nonce = models.CharField(max_length=100)

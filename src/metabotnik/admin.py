@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.conf import settings
 
-from metabotnik.models import DropBoxInfo, Project, File, Task
+from metabotnik.models import DropBoxInfo, Project, File, Task, Composite
 from metabotnik.tasks import execute_task
 
 # Define an inline admin descriptor for Employee model
@@ -58,3 +58,5 @@ class TaskAdmin(admin.ModelAdmin):
             execute_task(task)
 
 admin.site.register(Task, TaskAdmin)
+
+admin.site.register(Composite)

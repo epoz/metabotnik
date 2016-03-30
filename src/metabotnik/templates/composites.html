@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block maincontent %}
+
+<div style="padding: 30px">
+
+<h1>Composite metabotniks</h1>
+
+{% if not user.is_anonymous %}
+<a href="#" class="conversionbutton">New Composite</a>    
+{% endif %}
+
+
+{% if composites %}
+{% for c in composites %} <p style="margin: 0">
+    <a href="{% url 'composite' c.pk %}">{{c}}</a>
+    </p>{% endfor %}
+{% else %}
+<p>You have not created any composites yet</p>
+{% endif %}
+    
+</div>
+
+{% endblock maincontent %}
+

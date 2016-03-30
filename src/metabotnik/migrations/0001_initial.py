@@ -1,132 +1,94 @@
 # -*- coding: utf-8 -*-
-from south.utils import datetime_utils as datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import models, migrations
+from django.conf import settings
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'DropBoxInfo'
-        db.create_table(u'metabotnik_dropboxinfo', (
-            ('user', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True, primary_key=True)),
-            ('access_token', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('timestamp', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
-        ))
-        db.send_create_signal(u'metabotnik', ['DropBoxInfo'])
+    dependencies = [
+        ('auth', '0001_initial'),
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+    ]
 
-        # Adding model 'Project'
-        db.create_table(u'metabotnik_project', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=250, blank=True)),
-            ('path', self.gf('django.db.models.fields.TextField')()),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='projects', to=orm['auth.User'])),
-            ('status', self.gf('django.db.models.fields.CharField')(default='new', max_length=100)),
-            ('num_files_on_dropbox', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('layout_mode', self.gf('django.db.models.fields.CharField')(default='horizontal', max_length=100)),
-            ('preview_width', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('preview_height', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('metabotnik_width', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('metabotnik_height', self.gf('django.db.models.fields.IntegerField')(default=0)),
-        ))
-        db.send_create_signal(u'metabotnik', ['Project'])
-
-        # Adding model 'Task'
-        db.create_table(u'metabotnik_task', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('action', self.gf('django.db.models.fields.CharField')(max_length=200)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='tasks', to=orm['auth.User'])),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('time_started', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
-            ('time_ended', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
-            ('status', self.gf('django.db.models.fields.CharField')(default='new', max_length=100)),
-            ('payload_data', self.gf('django.db.models.fields.TextField')()),
-        ))
-        db.send_create_signal(u'metabotnik', ['Task'])
-
-
-    def backwards(self, orm):
-        # Deleting model 'DropBoxInfo'
-        db.delete_table(u'metabotnik_dropboxinfo')
-
-        # Deleting model 'Project'
-        db.delete_table(u'metabotnik_project')
-
-        # Deleting model 'Task'
-        db.delete_table(u'metabotnik_task')
-
-
-    models = {
-        u'auth.group': {
-            'Meta': {'object_name': 'Group'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '80'}),
-            'permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'})
-        },
-        u'auth.permission': {
-            'Meta': {'ordering': "(u'content_type__app_label', u'content_type__model', u'codename')", 'unique_together': "((u'content_type', u'codename'),)", 'object_name': 'Permission'},
-            'codename': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contenttypes.ContentType']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
-        },
-        u'auth.user': {
-            'Meta': {'object_name': 'User'},
-            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
-            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'groups': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "u'user_set'", 'blank': 'True', 'to': u"orm['auth.Group']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "u'user_set'", 'blank': 'True', 'to': u"orm['auth.Permission']"}),
-            'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
-        },
-        u'contenttypes.contenttype': {
-            'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
-            'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        },
-        u'metabotnik.dropboxinfo': {
-            'Meta': {'object_name': 'DropBoxInfo'},
-            'access_token': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'timestamp': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['auth.User']", 'unique': 'True', 'primary_key': 'True'})
-        },
-        u'metabotnik.project': {
-            'Meta': {'object_name': 'Project'},
-            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'layout_mode': ('django.db.models.fields.CharField', [], {'default': "'horizontal'", 'max_length': '100'}),
-            'metabotnik_height': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'metabotnik_width': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '250', 'blank': 'True'}),
-            'num_files_on_dropbox': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'path': ('django.db.models.fields.TextField', [], {}),
-            'preview_height': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'preview_width': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'status': ('django.db.models.fields.CharField', [], {'default': "'new'", 'max_length': '100'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'projects'", 'to': u"orm['auth.User']"})
-        },
-        u'metabotnik.task': {
-            'Meta': {'ordering': "('created',)", 'object_name': 'Task'},
-            'action': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'payload_data': ('django.db.models.fields.TextField', [], {}),
-            'status': ('django.db.models.fields.CharField', [], {'default': "'new'", 'max_length': '100'}),
-            'time_ended': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'time_started': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'tasks'", 'to': u"orm['auth.User']"})
-        }
-    }
-
-    complete_apps = ['metabotnik']
+    operations = [
+        migrations.CreateModel(
+            name='DropBoxInfo',
+            fields=[
+                ('user', models.OneToOneField(primary_key=True, serialize=False, to=settings.AUTH_USER_MODEL)),
+                ('access_token', models.CharField(max_length=100)),
+                ('timestamp', models.DateTimeField(auto_now=True)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='File',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('filename', models.CharField(max_length=250)),
+                ('metadata', models.TextField(null=True, blank=True)),
+                ('width', models.IntegerField(default=0)),
+                ('height', models.IntegerField(default=0)),
+                ('x', models.IntegerField(default=0)),
+                ('y', models.IntegerField(default=0)),
+                ('new_width', models.IntegerField(default=0)),
+                ('new_height', models.IntegerField(default=0)),
+                ('size', models.IntegerField(default=0)),
+                ('order', models.IntegerField(default=0)),
+                ('is_break', models.BooleanField(default=False)),
+            ],
+            options={
+                'ordering': ('project', 'order'),
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Project',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=250, blank=True)),
+                ('description', models.TextField(blank=True)),
+                ('path', models.TextField()),
+                ('status', models.CharField(default=b'new', max_length=100, choices=[(b'new', b'New'), (b'downloading', b'Busy Downloading Files'), (b'layout', b'Needs Layout'), (b'preview', b'Has a Preview'), (b'generating', b'Busy Generating'), (b'dzgen', b'Busy Making DeepZoom'), (b'done', b'Done with making your Metabotnik'), (b'deleted', b'Deleted')])),
+                ('num_files_on_dropbox', models.IntegerField(default=0)),
+                ('created', models.DateTimeField(auto_now_add=True)),
+                ('layout_mode', models.CharField(default=b'horizontal', max_length=100, choices=[(b'horizontal', b'horizontal'), (b'vertical', b'vertical'), (b'random', b'random')])),
+                ('layout_data', models.TextField(null=True, blank=True)),
+                ('background_color', models.CharField(default=b'#ffffff', max_length=7)),
+                ('metabotnik_nonce', models.CharField(max_length=100, null=True, blank=True)),
+                ('public', models.BooleanField(default=False)),
+                ('storage_size', models.IntegerField(default=0)),
+                ('user', models.ForeignKey(related_name=b'projects', to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Task',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('action', models.CharField(max_length=200)),
+                ('created', models.DateTimeField(auto_now_add=True)),
+                ('time_started', models.DateTimeField(null=True, blank=True)),
+                ('time_ended', models.DateTimeField(null=True, blank=True)),
+                ('status', models.CharField(default=b'new', max_length=100, choices=[(b'new', b'New'), (b'wip', b'In Progress'), (b'error', b'Error'), (b'done', b'Done')])),
+                ('payload_data', models.TextField()),
+                ('project', models.ForeignKey(related_name=b'tasks', blank=True, to='metabotnik.Project', null=True)),
+                ('user', models.ForeignKey(related_name=b'tasks', to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+                'ordering': ('created',),
+            },
+            bases=(models.Model,),
+        ),
+        migrations.AddField(
+            model_name='file',
+            name='project',
+            field=models.ForeignKey(related_name=b'files', to='metabotnik.Project'),
+            preserve_default=True,
+        ),
+    ]

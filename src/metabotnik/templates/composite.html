@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block maincontent %}
+
+<div style="width: 100%;">
+    <h1>{{name}}</h1>
+    {% if err %}
+    <pre>{{err}}</pre>        
+    {% endif %}
+    
+    <div id="thedzi1" class="openseadragon" style="height: 500px;"></div>
+</div>
+        
+{% endblock maincontent %}
+
+{% block extra_javascript_end %}
+            var viewer1 = OpenSeadragon({
+                id:            "thedzi1",
+                prefixUrl:     '{{STATIC_URL}}openseadragon/images/',
+                showNavigator:  false,
+                collectionMode: true,
+            });
+{% for p in projects %}
+            viewer1.addTiledImage({tileSource:'/s/project_{{p.pk}}/{{p.metabotnik_nonce}}.dzi'});
+{% endfor %}
+            viewer1.viewport.goHome();  
+            
+{% endblock extra_javascript_end %}

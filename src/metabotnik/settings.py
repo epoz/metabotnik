@@ -37,7 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django_markup',
     'metabotnik',
-    'south',
+#    'south',
 )
 
 MIDDLEWARE_CLASSES = (
