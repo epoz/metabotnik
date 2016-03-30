@@ -23,6 +23,6 @@
 {% for p in projects %}
             viewer1.addTiledImage({tileSource:'/s/project_{{p.pk}}/{{p.metabotnik_nonce}}.dzi'});
 {% endfor %}
-            viewer1.viewport.goHome();  
+setTimeout(function() {viewer1.viewport.goHome()}, 500);
             
 {% endblock extra_javascript_end %}
