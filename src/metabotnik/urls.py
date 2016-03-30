@@ -6,7 +6,7 @@ from django.contrib import admin
 admin.site.index_template = 'custom_admin_index.html'
 admin.autodiscover()
 
-urlpatterns = patterns('',    
+urlpatterns = [    
     url(r'^$', metabotnik.views.home, name='home'),
     url(r'^help/(\w+)$', metabotnik.views.help, name='help'),
 
@@ -34,4 +34,4 @@ urlpatterns = patterns('',
     url(r'^dropboxauthredirect$', metabotnik.auth.dropboxauthredirect, name='dropboxauthredirect'),
 
     url(r'^admin/', admin.site.urls),
-)
+]
