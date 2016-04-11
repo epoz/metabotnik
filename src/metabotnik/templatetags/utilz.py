@@ -1,5 +1,6 @@
 from django import template
 from metabotnik.models import project_status_choices
+from django.utils.safestring import mark_safe
 
 register = template.Library()
 
@@ -19,4 +20,4 @@ def json_to_overlay(datadict):
         if 'LINK' in obj.get('metadata', {}):
             tmp = (obj['pk'], obj['x']+10, obj['y']+100)
             buf.append(u"{id: 'overlay%s', px:%s, py:%s}" % tmp)
-    return u'\n,'.join(buf)
+    return mark_safe(u'\n,'.join(buf))
