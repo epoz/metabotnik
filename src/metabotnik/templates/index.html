@@ -25,6 +25,7 @@
                 prefixUrl:     '{{STATIC_URL}}openseadragon/images/',
                 showNavigator:  false,
                 collectionMode: true,
+                collectionRows: 8,
             });
 {% for p in projects %}
             viewer1.addTiledImage({tileSource:'/s/project_{{p.pk}}/{{p.metabotnik_nonce}}.dzi'});
