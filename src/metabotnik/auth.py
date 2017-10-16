@@ -19,6 +19,7 @@ def logoutview(request):
     return render(request, 'index.html')    
 
 def loginview(request):
+    return render(request, 'dropboxapiupgrade.html')
     # Check to see if user is logged in already
     if request.user.is_authenticated():
         raise Exception()
