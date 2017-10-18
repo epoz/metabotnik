@@ -1,6 +1,7 @@
 from django.shortcuts import render, resolve_url, redirect
 from django.core.urlresolvers import reverse
-from dropbox.client import DropboxOAuth2Flow, DropboxClient
+import dropbox
+from dropbox import DropboxOAuth2Flow, Dropbox
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.conf import settings
@@ -19,7 +20,6 @@ def logoutview(request):
     return render(request, 'index.html')    
 
 def loginview(request):
-    return render(request, 'dropboxapiupgrade.html')
     # Check to see if user is logged in already
     if request.user.is_authenticated():
         raise Exception()
@@ -27,38 +27,41 @@ def loginview(request):
 
 def dropboxauthredirect(request):
     try:
-        access_token, user_id, url_state = \
-                get_dropbox_auth_flow(request).finish(request.GET)        
-        user = authenticate(user_id=user_id, access_token=access_token)
+        oauth_result = get_dropbox_auth_flow(request).finish(request.GET)
+        account_id = oauth_result.account_id
+        access_token = oauth_result.access_token
+        user = authenticate(account_id=account_id, access_token=access_token)
         if user.is_active:
             login(request, user)
             return redirect('/')
         else:
             return redirect(reverse('help', args=['await']))
-    except DropboxOAuth2Flow.BadRequestException, e:
+    except dropbox.oauth.BadRequestException, e:
         return HttpResponseBadRequest()
-    except DropboxOAuth2Flow.BadStateException, e:
+    except dropbox.oauth.BadStateException, e:
         # Start the auth flow again.
         return redirect("login")
-    except DropboxOAuth2Flow.CsrfException, e:
+    except dropbox.oauth.CsrfException, e:
         return HttpResponseForbidden()
-    except DropboxOAuth2Flow.NotApprovedException, e:
+    except dropbox.oauth.NotApprovedException, e:
         return redirect("home")
-    except DropboxOAuth2Flow.ProviderException, e:
+    except dropbox.oauth.ProviderException, e:
         return HttpResponseForbidden()
+
 
 class DropboxAuthBackend(object):
     def authenticate(self, **credentials):
-        user_id, access_token = credentials.get('user_id'), credentials.get('access_token')
-        client = DropboxClient(access_token)
-        info = client.account_info()
+        #TODO user_id comes in here?
+        account_id, access_token = credentials.get('account_id'), credentials.get('access_token')
+        client = Dropbox(access_token)
+        info = client.users_get_current_account()
         try:
-            user = User.objects.get(username=user_id)
+            user = User.objects.get(username=account_id)
         except User.DoesNotExist:
-            user = User.objects.create(username=user_id, 
+            user = User.objects.create(username=account_id, 
                                        password='bogus',
-                                       last_name=info.get('display_name'),
-                                       email=info.get('email'),
+                                       last_name=info.name.display_name,
+                                       email=info.email,
                                        is_active=False)
             DropBoxInfo.objects.create(user=user, access_token=access_token)
             send_mail('A new Metabotnik user has registered', 

@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseForbidden
 from django.db.models.query_utils import Q
 from django.conf import settings
-from dropbox.client import DropboxClient
+import dropbox
 from metabotnik.models import Project, new_task
 import metabotnik.planodo
 import os
@@ -221,9 +221,8 @@ def projects(request):
 
 @login_required
 def folders(request):
-    client = DropboxClient(request.user.dropboxinfo.access_token)
-    path = request.GET.get('path', '/')
-    folder_metadata = client.metadata(path)
+    client = dropbox.Dropbox(request.user.dropboxinfo.access_token)
+    path = request.GET.get('path', '')
 
     # Given a path like: /a/b/c
     # We want the pathsplit to look like:
@@ -240,21 +239,19 @@ def folders(request):
     # Maintain a list of folders so we can display the header to browse to them nicely
     folders = []
 
-    for x in folder_metadata['contents']:
-        if x['is_dir']:
-            folders.append(x)
+    for x in client.files_list_folder(path).entries:
+        if type(x) == dropbox.files.FolderMetadata:
+            folders.append(x.path_lower)
             continue
         # skip really small files, they are probably bogus or in transit
-        if x['bytes'] < 1024:
+        if x.size < 1024:
             continue
-        x_lower = x['path'].lower()
-        if x_lower.endswith('.jpg') or x_lower.endswith('.jpeg'):
-            filesize_total += x['bytes']
+        if x.path_lower.endswith('.jpg') or x.path_lower.endswith('.jpeg'):
+            filesize_total += x.size
             jpeg_files.append(x)
 
     return render(request, 'folders.html', 
-                  {'folder_metadata':folder_metadata, 
-                   'folders': folders,
+                  {'folders': folders,
                    'path':path, 
                    'pathsplit': pathsplit,
                    'filesize_total': filesize_total, 

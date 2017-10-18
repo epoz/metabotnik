@@ -10,10 +10,8 @@
 {% if folders %}
 <div class="browsefolders">
         <h3>Browse to a sub-folder:</h3>
-        {% for f in folder_metadata.contents %}
-            {% if f.is_dir %}
-            <p><a href="?path={{f.path}}">{{f.path}}</a></p>    
-            {% endif %}        
+        {% for f in folders %}
+			<p><a href="?path={{f}}">{{f}}</a></p>    
         {% endfor %}        
 </div>
 {% endif %}

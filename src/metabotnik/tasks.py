@@ -1,5 +1,5 @@
 from metabotnik.models import Project, File, new_task
-from dropbox.client import DropboxClient
+from dropbox import Dropbox
 import os
 import sys
 import subprocess
@@ -155,20 +155,17 @@ def download_dropboxfiles(payload):
     project.set_status('downloading')
 
     # Check to see what files to download from Dropbox
-    client = DropboxClient(project.user.dropboxinfo.access_token)
-    folder_metadata = client.metadata(project.path)
+    client = Dropbox(project.user.dropboxinfo.access_token)
     num_files = 0
-    for x in folder_metadata['contents']:
-        if x['path'].lower().endswith('.jpg') and x['bytes'] > 0:
+    for x in client.files_list_folder(project.path).entries:
+        if x.path_lower.endswith('.jpg') and x.size > 0:
             # Download the file from Dropbox to local disk
-            local_filename = os.path.split(x['path'].lower())[-1]
+            local_filename = os.path.split(x.path_lower)[-1]
             local_filepath = os.path.join(project.originals_path, local_filename)
             num_files += 1
             if os.path.exists(local_filepath): # and not payload.get('redownload') == True
                 continue
-            with client.get_file(x['path']) as f:
-                open(local_filepath, 'wb').write(f.read())
-    
+            client.files_download_to_file(local_filepath, x.path_lower)
 
     
     # Get the metadata as a separate task
