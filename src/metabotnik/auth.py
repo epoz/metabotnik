@@ -8,6 +8,7 @@ from django.conf import settings
 from django.http.response import HttpResponseBadRequest, HttpResponseForbidden
 from django.core.mail import send_mail
 from metabotnik.models import DropBoxInfo
+import binascii
 
 def get_dropbox_auth_flow(request):
     proto = 'https://' if request.is_secure() else 'http://'
@@ -55,10 +56,13 @@ class DropboxAuthBackend(object):
         account_id, access_token = credentials.get('account_id'), credentials.get('access_token')
         client = Dropbox(access_token)
         info = client.users_get_current_account()
+        # Django User object has a max length of 30, so we can't store the account_id which is longer
+        # So let's just save it as a hash
+        account_id_hash = str(binascii.crc32(account_id))
         try:
-            user = User.objects.get(username=account_id)
+            user = User.objects.get(username=account_id_hash)
         except User.DoesNotExist:
-            user = User.objects.create(username=account_id, 
+            user = User.objects.create(username=account_id_hash, 
                                        password='bogus',
                                        last_name=info.name.display_name,
                                        email=info.email,
