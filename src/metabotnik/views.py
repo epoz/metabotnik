@@ -32,8 +32,7 @@ def help(request, page):
 def new_project(request):
     path = request.GET.get('new_with_folder')
     if not path:
-        return render(request, 'projects.html',
-                      {'message': 'No path specified for the new project?'})
+        path = ''
     filecount = request.GET.get('filecount', 0)        
     project = Project.objects.create(path=path, user=request.user, num_files_on_dropbox=filecount)
     new_task(request.user, {
@@ -208,7 +207,7 @@ def sorting_project(request, project_id):
                  }) 
 
 def projects(request):
-    if request.GET.get('new_with_folder'):
+    if 'new_with_folder' in request.GET:
         return new_project(request)
     criteria = Q(public=True)
     if not request.user.is_anonymous():
