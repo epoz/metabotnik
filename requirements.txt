@@ -11,5 +11,5 @@ natsort==4.0.3
 python-xmp-toolkit==2.0.1
 pytz==2015.6
 requests>=2.18.4
-urllib3==1.9
+urllib3==1.26.5
 wsgiref==0.1.2
