@@ -1,4 +1,4 @@
-Django==1.9.4
+Django==2.2.24
 Markdown==2.6.5
 Pillow==2.5.1
 TextBase==0.7
