@@ -5,7 +5,7 @@ TextBase==0.7
 django-markup==0.4
 dropbox==8.4.0
 gnureadline==6.3.3
-ipython==2.2.0
+ipython==7.16.3
 mercurial==2.9
 natsort==4.0.3
 python-xmp-toolkit==2.0.1
